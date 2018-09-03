@@ -1,0 +1,18 @@
+<!--header.html-->
+
+<!doctype html>
+<html>
+
+  <head>
+    <!--Use the `title` variable to set the title of the page-->
+    <title>{{ .title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+
+    <!--CSS library-->
+    <link href="https://unpkg.com/basscss@8.0.2/css/basscss.min.css" rel="stylesheet">
+  </head>
+
+  <body class="container">
+    <!--Embed the menu.html template at this location-->
+    {{ template "menu.html" . }}
