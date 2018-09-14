@@ -1,0 +1,14 @@
+<!--folder.html-->
+
+<!--Embed the header.html template at this location-->
+{{ template "header.html" .}}
+
+  {{range .payload}}
+    <a href="/folder/view/{{.Owner}}/{{.FolderNameURL}}">
+        <h2>{{.FolderName}}</h2>
+    </a>
+    <p>{{.NumElements}} files</p>
+  {{end }}
+
+<!--Embed the footer.html template at this location-->
+<!--{{ template "footer.html" .}}-->
