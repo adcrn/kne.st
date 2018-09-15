@@ -15,7 +15,9 @@ func TestGetUsersFolders(t *testing.T) {
         if v.Owner != folderList[i].Owner ||
         v.FolderName != folderList[i].FolderName ||
         v.Created != folderList[i].Created ||
-        v.NumElements != folderList[i].NumElements {
+        v.NumElements != folderList[i].NumElements ||
+        v.Completed != folderList[i].Completed ||
+        v.Downloaded != folderList[i].Downloaded {
             
         t.Fail()
         break

@@ -10,6 +10,7 @@ import (
 )
 
 var tmpFolderList []folder
+var tmpUserList []user
 
 // This function is used for setup before executing the test functions
 func TestMain(m *testing.M) {
@@ -47,9 +48,11 @@ func testHTTPResponse(t *testing.T, r *gin.Engine, req *http.Request, f func(w *
 // for testing
 func saveLists() {
   tmpFolderList = folderList
+  tempUserList = userList
 }
 
 // This function is used to restore the main lists from the temporary one
 func restoreLists() {
   folderList = tmpFolderList
+  userList = tmpUserList
 }
