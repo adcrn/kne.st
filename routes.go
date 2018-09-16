@@ -7,4 +7,11 @@ func initRoutes() {
 
     r.GET("/folders", showFoldersPage)
 
+    userRoutes := r.Group("/u")
+    {
+        userRoutes.GET("/register", showRegistrationPage)
+
+        userRoutes.POST("/register", register)
+    }
+
 }

@@ -48,7 +48,7 @@ func testHTTPResponse(t *testing.T, r *gin.Engine, req *http.Request, f func(w *
 // for testing
 func saveLists() {
   tmpFolderList = folderList
-  tempUserList = userList
+  tmpUserList = userList
 }
 
 // This function is used to restore the main lists from the temporary one
