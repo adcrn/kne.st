@@ -1,0 +1,31 @@
+<!--register.html-->
+
+<!--Embed the header.html template at this location-->
+{{ template "header.html" .}}
+
+<h1>Sign Up</h1>
+
+<div class="columns">
+  <div class="column col-4 centered">
+    <!--If there's an error, display the error-->
+    {{ if .ErrorTitle}}
+    <p class="bg-danger">
+      {{.ErrorTitle}}: {{.ErrorMessage}}
+    </p>
+    {{end}}
+    <!--Create a form that POSTs to the `/u/register` route-->
+    <form class="form" action="/u/register" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="registration">Name</label>
+        <input class="form-input" type="text" id="fullname" placeholder="e.g. John Smith">
+        <label class="form-label" for="registration">Username</label>
+        <input class="form-input" type="text" id="username" placeholder="Desired Username">
+        <label class="form-label" for="registration">Password</label>
+        <input class="form-input" type="text" id="password" placeholder="Password">
+        <label class="form-label" for="registration">Email</label>
+        <input class="form-input" type="text" id="email" placeholder="e.g. hello@johnsmith.com">
+      </div>
+      <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+  </div>
+</div>  
