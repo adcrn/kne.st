@@ -2,16 +2,16 @@ package main
 
 func initRoutes() {
 
-    // Index route
-    r.GET("/", showIndexPage)
+	// Index route
+	r.GET("/", showIndexPage)
 
-    r.GET("/folders", showFoldersPage)
+	r.GET("/folders", showFoldersPage)
 
-    userRoutes := r.Group("/u")
-    {
-        userRoutes.GET("/register", showRegistrationPage)
+	userRoutes := r.Group("/u")
+	{
+		userRoutes.GET("/register", showRegistrationPage)
 
-        userRoutes.POST("/register", register)
-    }
+		userRoutes.POST("/register", register)
+	}
 
 }

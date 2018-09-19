@@ -1,99 +1,98 @@
 package main
 
 import (
-    "io/ioutil"
-    "net/http"
-    "net/http/httptest"
-    "net/url"
-    "strconv"
-    "strings"
-    "testing"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strconv"
+	"strings"
+	"testing"
 )
 
 // These functions serve as dummy returns for the login and
 // registration workflow unit tests.
 func getLoginPOSTPayload() string {
-    params := url.Values{}
-    params.Add("username", "test1")
-    params.Add("password", "pass1")
+	params := url.Values{}
+	params.Add("username", "test1")
+	params.Add("password", "pass1")
 
-    return params.Encode()
+	return params.Encode()
 }
 
 func getRegistrationPOSTPayload() string {
-    params := url.Values{}
-    params.Add("username", "u1")
-    params.Add("password", "p1")
+	params := url.Values{}
+	params.Add("username", "u1")
+	params.Add("password", "p1")
 
-    return params.Encode()
+	return params.Encode()
 }
 
 func TestShowRegistrationPageUnauthenticated(t *testing.T) {
-    r := getRouter(true)
+	r := getRouter(true)
 
-    r.GET("u/register", showRegistrationPage)
+	r.GET("u/register", showRegistrationPage)
 
-    req, _ := http.NewRequest("GET", "u/register", nil)
+	req, _ := http.NewRequest("GET", "u/register", nil)
 
-    testHTTPResponse(t, r, req, func(w *httptest.ResponseRecorder) bool {
-        statusOK := w.Code == http.StatusOK
+	testHTTPResponse(t, r, req, func(w *httptest.ResponseRecorder) bool {
+		statusOK := w.Code == http.StatusOK
 
-        p, err := ioutil.ReadAll(w.Body)
-        pageOK := err == nil && strings.Index(string(p), "<title>Register - knest</title>") > 0
+		p, err := ioutil.ReadAll(w.Body)
+		pageOK := err == nil && strings.Index(string(p), "<title>Register - knest</title>") > 0
 
-        return statusOK && pageOK
-    })
+		return statusOK && pageOK
+	})
 }
 
-
 func TestRegisterUnauthenticated(t *testing.T) {
-    saveLists()
+	saveLists()
 
-    w := httptest.NewRecorder()
+	w := httptest.NewRecorder()
 
-    r := getRouter(true)
+	r := getRouter(true)
 
-    r.POST("/u/register", register)
+	r.POST("/u/register", register)
 
-    registrationPayload := getRegistrationPOSTPayload()
-    req, _ := http.NewRequest("POST", "/u/register", strings.NewReader(registrationPayload))
-    req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-    req.Header.Add("Content-Length", strconv.Itoa(len(registrationPayload)))
+	registrationPayload := getRegistrationPOSTPayload()
+	req, _ := http.NewRequest("POST", "/u/register", strings.NewReader(registrationPayload))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Length", strconv.Itoa(len(registrationPayload)))
 
-    r.ServeHTTP(w, req)
+	r.ServeHTTP(w, req)
 
-    if w.Code != http.StatusOK {
-        t.Fail()
-    }
+	if w.Code != http.StatusOK {
+		t.Fail()
+	}
 
-    p, err := ioutil.ReadAll(w.Body)
+	p, err := ioutil.ReadAll(w.Body)
 
-    if err != nil || strings.Index(string(p), "<title>Successful registration &amp; Login</title>") < 0 {
-        t.Fail()
-    }
+	if err != nil || strings.Index(string(p), "<title>Successful registration &amp; Login</title>") < 0 {
+		t.Fail()
+	}
 
-    restoreLists()
+	restoreLists()
 }
 
 func TestRegisterUnauthenticatedUnavailableUsername(t *testing.T) {
-    saveLists()
+	saveLists()
 
-    w := httptest.NewRecorder()
+	w := httptest.NewRecorder()
 
-    r := getRouter(true)
+	r := getRouter(true)
 
-    r.POST("/u/register", register)
+	r.POST("/u/register", register)
 
-    registrationPayload := getLoginPOSTPayload()
-    req, _ := http.NewRequest("POST", "/u/register", strings.NewReader(registrationPayload))
-    req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-    req.Header.Add("Content-Length", strconv.Itoa(len(registrationPayload)))
+	registrationPayload := getLoginPOSTPayload()
+	req, _ := http.NewRequest("POST", "/u/register", strings.NewReader(registrationPayload))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Length", strconv.Itoa(len(registrationPayload)))
 
-    r.ServeHTTP(w, req)
+	r.ServeHTTP(w, req)
 
-    if w.Code != http.StatusBadRequest {
-        t.Fail()
-    }
+	if w.Code != http.StatusBadRequest {
+		t.Fail()
+	}
 
-    restoreLists()
+	restoreLists()
 }

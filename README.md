@@ -2,12 +2,27 @@
 
 A web application codebase for a possible subscription service-based version of knest.
 
+## Building
+```go build -o knest
+```
+
+## Usage
+```./knest
+$ direct browser to localhost:8080
+```
+
 ## Minimally Viable Components
-+ Landing page: offers a signup/login option and describes what the app
+[x] Landing page: offers a signup/login option and describes what the app
   does
-+ Authentication: only authorized users should be able to use the service
-+ Folder upload: allow for folder upload so users don't have to do a photo at a
+[ ] Authentication: only authorized users should be able to use the service
+[ ] Folder upload: allow for folder upload so users don't have to do a photo at a
   time
-+ Presentation of processed photos: previews photos that passed the stages
-+ Compression and download of processed photos: offers a zip file of finished
+[ ]Presentation of processed photos: previews photos that passed the stages
+[ ] Compression and download of processed photos: offers a zip file of finished
   photos
+
+## Current Progress
+The backend is being hashed out in piecemeal fashion in test-driven
+development fashion. A database engine and schema still need to be chosen for
+the act of storing photos. The frontend consists only of flat HTML files, but
+will be replaced by Vue.js with Spectre CSS at some point.

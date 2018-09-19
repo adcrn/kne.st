@@ -1,23 +1,23 @@
 package main
 
 import (
-    "net/http"
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func showRegistrationPage(c *gin.Context) {
-    c.HTML(
+	c.HTML(
 
-        http.StatusOK,
+		http.StatusOK,
 
-        "register.html",
+		"register.html",
 
-        gin.H{
-            "title": "Register - knest",
-        },
-    )
+		gin.H{
+			"title": "Register - knest",
+		},
+	)
 }
 
 func register(c *gin.Context) {
-    //
+	//
 }

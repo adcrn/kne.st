@@ -1,23 +1,23 @@
 package main
 
 import (
-    "net/http"
+	"net/http"
 
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 )
 
 func showIndexPage(c *gin.Context) {
-    c.HTML(
+	c.HTML(
 
-        // HTTP 200 (OK)
-        http.StatusOK,
+		// HTTP 200 (OK)
+		http.StatusOK,
 
-        // Render home page
-        "index.html",
+		// Render home page
+		"index.html",
 
-        // Index template uses the following data
-        gin.H{
-            "title": "knest",
-        },
-    )
+		// Index template uses the following data
+		gin.H{
+			"title": "knest",
+		},
+	)
 }
