@@ -1,15 +1,13 @@
-# webapp
+# kne.st
 
 A web application codebase for a possible subscription service-based version of knest.
 
 ## Building
-```go build -o knest
-```
+`go build -o knest`
 
 ## Usage
-```./knest
-$ direct browser to localhost:8080
-```
+Start the server by running `./knest` and then direct a browser to
+`localhost:8080`
 
 ## Minimally Viable Components
 [x] Landing page: offers a signup/login option and describes what the app
