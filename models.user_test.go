@@ -83,3 +83,32 @@ func TestInvalidUserRegistration(t *testing.T) {
 
 	restoreLists()
 }
+
+func TestUserValidity(t *testing.T) {
+	saveLists()
+
+	// Valid login.
+	if !isUserValid("test1", "pass1") {
+		t.Fail()
+	}
+
+	// Invalid login.
+	if isUserValid("test2", "pass1") {
+		t.Fail()
+	}
+
+	// No spaces for password.
+	if isUserValid("test1", "") {
+		t.Fail()
+	}
+
+	// No spaces for username.
+	if isUserValid("", "pass1") {
+		t.Fail()
+	}
+
+	// No captials in username.
+	if isUserValid("test1", "pass1") {
+		t.Fail()
+	}
+}

@@ -65,3 +65,7 @@ func isEmailAvailable(email string) bool {
 
 	return true
 }
+
+func isUserValid(username, password string) bool {
+	return false
+}
