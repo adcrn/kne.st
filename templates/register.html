@@ -3,7 +3,7 @@
 <!--Embed the header.html template at this location-->
 {{ template "header.html" .}}
 
-<h1>Sign Up</h1>
+<h1>Register</h1>
 
 <div class="columns">
   <div class="column col-4 centered">
@@ -16,14 +16,20 @@
     <!--Create a form that POSTs to the `/u/register` route-->
     <form class="form" action="/u/register" method="POST">
       <div class="form-group">
-        <label class="form-label" for="registration">Name</label>
-        <input class="form-input" type="text" id="fullname" placeholder="e.g. John Smith">
-        <label class="form-label" for="registration">Username</label>
-        <input class="form-input" type="text" id="username" placeholder="Desired Username">
-        <label class="form-label" for="registration">Password</label>
-        <input class="form-input" type="text" id="password" placeholder="Password">
-        <label class="form-label" for="registration">Email</label>
-        <input class="form-input" type="text" id="email" placeholder="e.g. hello@johnsmith.com">
+        <label for="fullname">Name</label>
+        <input class="form-input" type="text" id="fullname" name="fullname" required>
+      </div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input class="form-input" type="text" id="username" name="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input class="form-input" type="password" id="password" name="password" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input class="form-input" type="email" id="email" name="email" required>
       </div>
       <button type="submit" class="btn btn-primary">Register</button>
     </form>

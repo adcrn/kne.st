@@ -39,7 +39,7 @@ func TestShowRegistrationPageUnauthenticated(t *testing.T) {
 		statusOK := w.Code == http.StatusOK
 
 		p, err := ioutil.ReadAll(w.Body)
-		pageOK := err == nil && strings.Index(string(p), "<title>Register - knest</title>") > 0
+		pageOK := err == nil && strings.Index(string(p), "<title>Register</title>") > 0
 
 		return statusOK && pageOK
 	})
@@ -67,7 +67,7 @@ func TestRegisterUnauthenticated(t *testing.T) {
 
 	p, err := ioutil.ReadAll(w.Body)
 
-	if err != nil || strings.Index(string(p), "<title>Successful registration &amp; Login</title>") < 0 {
+	if err != nil || strings.Index(string(p), "<title>Successful registration, logging in...</title>") < 0 {
 		t.Fail()
 	}
 
