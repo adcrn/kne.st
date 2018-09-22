@@ -5,7 +5,11 @@ func initRoutes() {
 	// Index route
 	r.GET("/", showIndexPage)
 
-	r.GET("/folders", showFoldersPage)
+	// Status page
+	r.GET("/status", statusHandler)
+
+	//r.GET("/folders", showFoldersPage)
+	r.GET("/folders", fetchUserFolders)
 
 	userRoutes := r.Group("/u")
 	{

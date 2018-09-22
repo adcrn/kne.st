@@ -21,3 +21,15 @@ func showIndexPage(c *gin.Context) {
 		},
 	)
 }
+
+func statusHandler(c *gin.Context) {
+
+	c.JSON(
+
+		http.StatusOK,
+
+		gin.H{
+			"status": "Good.",
+		},
+	)
+}

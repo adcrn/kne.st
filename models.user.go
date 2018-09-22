@@ -2,15 +2,14 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 )
 
 type user struct {
-	Username string `json:"username"`
-	Password string `json:"-"`
-	FullName string `json:"fullname"`
-	Email    string `json:"email"`
+	Username string
+	Password string
+	FullName string
+	Email    string
 }
 
 // This should be populated from a database, but for prototyping, we'll define them here
