@@ -9,7 +9,7 @@ func initRoutes() {
 	r.GET("/status", statusHandler)
 
 	//r.GET("/folders", showFoldersPage)
-	r.GET("/folders", fetchUserFolders)
+	r.GET("/folders/:id", fetchUserFolders)
 
 	userRoutes := r.Group("/u")
 	{

@@ -6,7 +6,7 @@ import (
 )
 
 type folder struct {
-	Owner         string    `json:"owner"`
+	OwnerID       int       `json:"owner"`
 	FolderName    string    `json:"foldername"`
 	FolderNameURL string    `json:"foldernameurl"`
 	Created       time.Time `json:"created"`
@@ -16,17 +16,17 @@ type folder struct {
 }
 
 // Creating fake folders until for testing
-var folder1 = &folder{Owner: "nna24ga9zn2haa", FolderName: "terns", FolderNameURL: url.QueryEscape("terns"),
+var folder1 = &folder{OwnerID: 3, FolderName: "terns", FolderNameURL: url.QueryEscape("terns"),
 	Created: time.Date(2009, 11, 17, 20, 34, 58, 651387237, time.UTC), NumElements: 12,
 	Completed: false, Downloaded: false}
-var folder2 = &folder{Owner: "plabs42yabn6sd", FolderName: "2014 Milan", FolderNameURL: url.QueryEscape("2014 Milan"),
+var folder2 = &folder{OwnerID: 3, FolderName: "2014 Milan", FolderNameURL: url.QueryEscape("2014 Milan"),
 	Created: time.Date(2014, 9, 12, 8, 17, 42, 793654, time.UTC), NumElements: 27,
 	Completed: true, Downloaded: false}
 var folders = []*folder{}
 
 // This will take a user ID as a parameter and query the
 // database to return a list of folders associated with the user.
-func getUsersFolders() []*folder {
+func getUsersFolders(id int) []*folder {
 	folders = append(folders, folder1)
 	folders = append(folders, folder2)
 	return folders

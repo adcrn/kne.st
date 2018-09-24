@@ -1,16 +1,17 @@
 package main
 
 import (
-	"io/ioutil"
+	//"io/ioutil"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
+	//"strings"
 	"testing"
 )
 
 // Test that a GET request to the home page returns the home page with
 // the HTTP code 200 for an unauthenticated user
-func TestShowIndexPageUnauthenticated(t *testing.T) {
+/*func TestShowIndexPageUnauthenticated(t *testing.T) {
 	r := getRouter(true)
 
 	r.GET("/", showIndexPage)
@@ -31,4 +32,33 @@ func TestShowIndexPageUnauthenticated(t *testing.T) {
 
 		return statusOK && pageOK
 	})
+}*/
+
+func TestFetchUserFoldersValid(t *testing.T) {
+	r := getRouter(true)
+
+	r.GET("/folders/:id", fetchUserFolders)
+
+	req, _ := http.NewRequest("GET", "/folders/:3", nil)
+
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	// If the request was not completed properly
+	if w.Code != http.StatusOK {
+		t.Fail()
+	}
+
+	response := []folder{}
+	json.Unmarshal([]byte(w.Body.String()), &response)
+
+	value, exists := response[0]["owner"]
+
+	if value != 3 {
+		t.Fail()
+	}
+
+	if !exists {
+		t.Fail()
+	}
 }

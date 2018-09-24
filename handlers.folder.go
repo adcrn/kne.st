@@ -1,13 +1,11 @@
 package main
 
 import (
-	//"encoding/json"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
-func showFoldersPage(c *gin.Context) {
+/*func showFoldersPage(c *gin.Context) {
 	// Replace with getUserFoldersByID
 	folders := getUsersFolders()
 
@@ -19,14 +17,30 @@ func showFoldersPage(c *gin.Context) {
 			"payload": folders,
 		},
 	)
-}
+}*/
 
 func fetchUserFolders(c *gin.Context) {
-	// Replace with getUserFoldersByID
-	folders := getUsersFolders()
+	// Retrieve user ID from GET request and
+	// convert it to an integer
+	userID, err := strconv.Atoi(c.Param("id")[1:])
 
-	//payload, _ := json.Marshal(folders)
+	// If ID is not a parsable number,
+	// return an error string
+	if err != nil {
+		c.JSON(
+
+			400,
+
+			gin.H{
+				"response": "malformed userID",
+			},
+		)
+		return
+	}
+
+	// Otherwise, return all folders associated
+	// with that user ID
+	folders := getUsersFolders(userID)
 
 	c.JSON(200, folders)
-
 }
