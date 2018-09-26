@@ -84,7 +84,7 @@ func TestInvalidUserRegistration(t *testing.T) {
 	restoreLists()
 }
 
-func TestUserValidity(t *testing.T) {
+/*func TestUserValidity(t *testing.T) {
 	saveLists()
 
 	// Valid login.
@@ -111,4 +111,6 @@ func TestUserValidity(t *testing.T) {
 	if isUserValid("test1", "pass1") {
 		t.Fail()
 	}
-}
+
+	restoreLists()
+}*/

@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"io/ioutil"
 	"net/http"
@@ -95,4 +96,4 @@ func TestRegisterUnauthenticatedUnavailableUsername(t *testing.T) {
 	}
 
 	restoreLists()
-}
+}*/

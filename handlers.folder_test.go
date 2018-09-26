@@ -1,38 +1,12 @@
 package main
 
 import (
-	//"io/ioutil"
 	"encoding/json"
+	//"fmt"
 	"net/http"
 	"net/http/httptest"
-	//"strings"
 	"testing"
 )
-
-// Test that a GET request to the home page returns the home page with
-// the HTTP code 200 for an unauthenticated user
-/*func TestShowIndexPageUnauthenticated(t *testing.T) {
-	r := getRouter(true)
-
-	r.GET("/", showIndexPage)
-
-	// Create a request to send to the above route
-	req, _ := http.NewRequest("GET", "/", nil)
-
-	testHTTPResponse(t, r, req, func(w *httptest.ResponseRecorder) bool {
-
-		// Test that the http status code is 200
-		statusOK := w.Code == http.StatusOK
-
-		// Test that the page title is "Home Page"
-		// You can carry out a lot more detailed tests using libraries that can
-		// parse and process HTML pages
-		p, err := ioutil.ReadAll(w.Body)
-		pageOK := err == nil && strings.Index(string(p), "<title>knest</title>") > 0
-
-		return statusOK && pageOK
-	})
-}*/
 
 func TestFetchUserFoldersValid(t *testing.T) {
 	r := getRouter(true)
@@ -52,13 +26,24 @@ func TestFetchUserFoldersValid(t *testing.T) {
 	response := []folder{}
 	json.Unmarshal([]byte(w.Body.String()), &response)
 
-	value, exists := response[0]["owner"]
+	value := response[0].OwnerID
 
 	if value != 3 {
 		t.Fail()
 	}
+}
 
-	if !exists {
+func TestFetchUserFoldersInvalid(t *testing.T) {
+	r := getRouter(true)
+
+	r.GET("/folders/:id", fetchUserFolders)
+
+	req, _ := http.NewRequest("GET", "/folders/:blah", nil)
+
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	if w.Code != 400 {
 		t.Fail()
 	}
 }
