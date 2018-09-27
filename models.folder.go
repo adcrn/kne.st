@@ -31,3 +31,12 @@ func getUsersFolders(id int) []*folder {
 	folders = append(folders, folder2)
 	return folders
 }
+
+func deleteFolderDatabaseRecord(ownerid int, foldername string) (bool, error) {
+
+	// Return false with an error if the user does not
+	// exist in the database or if the folder name does not
+	// match a folder that is associated with that particular user ID.
+
+	return true, nil
+}

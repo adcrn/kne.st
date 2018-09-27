@@ -5,20 +5,6 @@ import (
 	"strconv"
 )
 
-/*func showFoldersPage(c *gin.Context) {
-	// Replace with getUserFoldersByID
-	folders := getUsersFolders()
-
-	c.HTML(
-		http.StatusOK,
-		"folder.html",
-		gin.H{
-			"title":   "Folders - knest",
-			"payload": folders,
-		},
-	)
-}*/
-
 func fetchUserFolders(c *gin.Context) {
 	// Retrieve user ID from GET request and
 	// convert it to an integer
@@ -43,4 +29,42 @@ func fetchUserFolders(c *gin.Context) {
 	folders := getUsersFolders(userID)
 
 	c.JSON(200, folders)
+}
+
+func deleteUserFolder(c *gin.Context) {
+	userID, err_user := strconv.Atoi(c.Param("id")[1:])
+	foldername := c.Param("foldername")[1:]
+
+	if err_user != nil {
+		c.JSON(
+
+			400,
+
+			gin.H{
+				"response": "malformed userID",
+			},
+		)
+		return
+	}
+
+	_, err := deleteFolderDatabaseRecord(userID, foldername)
+
+	if err != nil {
+		c.JSON(
+
+			400,
+
+			gin.H{
+				"response": err.Error(),
+			},
+		)
+		return
+	} else {
+		c.JSON(
+			204,
+			gin.H{
+				"response": "success",
+			},
+		)
+	}
 }

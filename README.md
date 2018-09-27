@@ -20,7 +20,6 @@ Start the server by running `./knest` and then direct a browser to
   photos
 
 ## Current Progress
-The backend is being hashed out in piecemeal fashion in test-driven
-development fashion. A database engine and schema still need to be chosen for
-the act of storing photos. The frontend consists only of flat HTML files, but
-will be replaced by Vue.js with Spectre CSS at some point.
+The backend API is being hashed out in piecemeal fashion through test-driven
+development. A database engine and schema still need to be chosen for
+the act of storing folders and their photos. The frontend will consume the API; it will probably be Vue.js with Bulma CSS.
