@@ -20,12 +20,10 @@ func showRegistrationPage(c *gin.Context) {
 
 func register(c *gin.Context) {
 
-	username := c.PostForm("username")
-	password := c.PostForm("password")
-	fullname := c.PostForm("fullname")
-	email := c.PostForm("email")
+	var u user
+	c.BindJSON(&u)
 
-	if _, err := registerNewUser(username, password, fullname, email); err == nil {
+	if _, err := registerNewUser(u); err == nil {
 
 		render(c, gin.H{
 			"title": "Successful registration, logging in..."}, "login_success.html")

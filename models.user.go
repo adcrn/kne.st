@@ -6,10 +6,10 @@ import (
 )
 
 type user struct {
-	Username string
-	Password string
-	FullName string
-	Email    string
+	Username string `json: username`
+	Password string `json: password`
+	FullName string `json: fullname`
+	Email    string `json: email`
 }
 
 // This should be populated from a database, but for prototyping, we'll define them here
@@ -19,26 +19,27 @@ var userList = []user{
 	{Username: "test3", Password: "pass3", FullName: "Test ThreeThey", Email: "they3@test.com"},
 }
 
-func registerNewUser(username, password, fullname, email string) (*user, error) {
+func registerNewUser(u user) (bool, error) {
 
 	// Make sure password isn't empty.
-	if strings.TrimSpace(password) == "" {
-		return nil, errors.New("Passwords cannot be empty.")
+	if strings.TrimSpace(u.Password) == "" {
+		return false, errors.New("Passwords cannot be empty.")
 	}
 
-	if !isUsernameAvailable(username) {
-		return nil, errors.New("Username is already taken.")
+	if !isUsernameAvailable(u.Username) {
+		return false, errors.New("Username is already taken.")
 	}
 
-	if !isEmailAvailable(email) {
-		return nil, errors.New("There is already an account associated with this email address.")
+	if !isEmailAvailable(u.Email) {
+		return false, errors.New("There is already an account associated with this email address.")
 	}
-
-	u := user{Username: username, Password: password, FullName: fullname, Email: email}
 
 	userList = append(userList, u)
 
-	return &u, nil
+	// this function will eventually return a boolean representing
+	// the outcome of actually inserting a user into the database
+
+	return true, nil
 }
 
 // This will be replaced by a call to the users table of the database
