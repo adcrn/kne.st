@@ -25,12 +25,24 @@ func register(c *gin.Context) {
 
 	if _, err := registerNewUser(u); err == nil {
 
-		render(c, gin.H{
-			"title": "Successful registration, logging in..."}, "login_success.html")
+		c.JSON(
+
+			200,
+
+			gin.H{
+				"response": "registration successful",
+			},
+		)
 	} else {
-		c.HTML(http.StatusBadRequest, "register.html", gin.H{
-			"ErrorTitle":   "Registration Failed",
-			"ErrorMessage": err.Error()})
+
+		c.JSON(
+
+			400,
+
+			gin.H{
+				"response": err.Error(),
+			},
+		)
 	}
 }
 
