@@ -8,11 +8,11 @@ import (
 // User contains login credentials and details about their profile including
 // subscription type, which will dictate certain capabilities
 type User struct {
-	Username         string `json: "username"`
-	Password         string `json: "password"`
-	FullName         string `json: "fullname"`
-	Email            string `json: "email"`
-	SubscriptionType int    `json: "sub_type"`
+	Username         string `json:"username"`
+	Password         string `json:"password"`
+	FullName         string `json:"fullname"`
+	Email            string `json:"email"`
+	SubscriptionType int    `json:"sub_type"`
 }
 
 // UserList should be populated from a database, but for prototyping, we'll define them here
