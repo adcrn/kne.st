@@ -27,7 +27,7 @@ var folder2 = &Folder{OwnerID: 3, FolderName: "2014 Milan", FolderNameURL: url.Q
 // Folders is a list of fake folders
 var Folders = []*Folder{}
 
-// This will take a user ID as a parameter and query the
+// GetUsersFolders will take a user ID as a parameter and query the
 // database to return a list of folders associated with the user.
 func GetUsersFolders(id int) []*Folder {
 	Folders = append(Folders, folder1)
