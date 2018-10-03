@@ -38,7 +38,7 @@ func deleteUserFolder(c *gin.Context) {
 	userID, errUser := strconv.Atoi(c.Param("id")[1:])
 	foldername := c.Param("foldername")[1:]
 
-	if err_user != nil {
+	if errUser != nil {
 		c.JSON(
 
 			400,
