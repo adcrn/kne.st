@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Folder is the main construct that will associated with users.
 type Folder struct {
 	OwnerID       int       `json:"owner"`
 	FolderName    string    `json:"foldername"`
@@ -22,6 +23,8 @@ var folder1 = &Folder{OwnerID: 3, FolderName: "terns", FolderNameURL: url.QueryE
 var folder2 = &Folder{OwnerID: 3, FolderName: "2014 Milan", FolderNameURL: url.QueryEscape("2014 Milan"),
 	Created: time.Date(2014, 9, 12, 8, 17, 42, 793654, time.UTC), NumElements: 27,
 	Completed: true, Downloaded: false}
+
+// Folders is a list of fake folders
 var Folders = []*Folder{}
 
 // This will take a user ID as a parameter and query the
@@ -32,6 +35,8 @@ func GetUsersFolders(id int) []*Folder {
 	return Folders
 }
 
+// DeleteFolderDatabaseRecord takes in the ID of the user that owns the folder
+// and will attempt to delete the record of the folder from the database.
 func DeleteFolderDatabaseRecord(ownerid int, foldername string) (bool, error) {
 
 	// Return false with an error if the user does not

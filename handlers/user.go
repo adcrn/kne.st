@@ -5,6 +5,8 @@ import (
 	"kne.st/models"
 )
 
+// Register is the handler through which a user's desired credentials and
+// details are taken and passed to RegisterNewUser.
 func Register(c *gin.Context) {
 
 	var u models.User

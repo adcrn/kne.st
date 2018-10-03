@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ShowIndexPage will return the home page of the website when the user
+// navigates to the root of the site.
 func ShowIndexPage(c *gin.Context) {
 	c.HTML(
 
@@ -22,6 +24,8 @@ func ShowIndexPage(c *gin.Context) {
 	)
 }
 
+// StatusHandler returns the status of each component of the site. Right now,
+// it just returns the status of the site.
 func StatusHandler(c *gin.Context) {
 
 	c.JSON(

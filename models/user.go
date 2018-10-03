@@ -5,20 +5,24 @@ import (
 	"strings"
 )
 
+// User contains login credentials and details about their profile including
+// subscription type, which will dictate certain capabilities
 type User struct {
-	Username string `json: username`
-	Password string `json: password`
-	FullName string `json: fullname`
-	Email    string `json: email`
+	Username         string `json: username`
+	Password         string `json: password`
+	FullName         string `json: fullname`
+	Email            string `json: email`
+	SubscriptionType int    `json: sub_type`
 }
 
-// This should be populated from a database, but for prototyping, we'll define them here
+// UserList should be populated from a database, but for prototyping, we'll define them here
 var UserList = []User{
 	{Username: "test1", Password: "pass1", FullName: "Test OneGuy", Email: "guy1@test.com"},
 	{Username: "test2", Password: "pass2", FullName: "Test TwoGal", Email: "gal2@test.com"},
 	{Username: "test3", Password: "pass3", FullName: "Test ThreeThey", Email: "they3@test.com"},
 }
 
+// RegisterNewUser attempts to insert a new user into the database
 func RegisterNewUser(u User) (bool, error) {
 
 	// Make sure password isn't empty.
