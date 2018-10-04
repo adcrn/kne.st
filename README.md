@@ -1,9 +1,12 @@
 # kne.st
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/adcrn/kne.st)](https://goreportcard.com/report/github.com/adcrn/kne.st)
 A web application codebase for a possible subscription service-based version of knest.
 
 ## Building
 `go build -o knest`
+
+## Testing
+`go test -v ./...`
 
 ## Usage
 Start the server by running `./knest` and then direct a browser to

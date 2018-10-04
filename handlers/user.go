@@ -12,7 +12,7 @@ func Register(c *gin.Context) {
 	var u models.User
 	c.BindJSON(&u)
 
-	if _, err := models.RegisterNewUser(u); err == nil {
+	if err := models.RegisterNewUser(u); err == nil {
 
 		c.JSON(
 

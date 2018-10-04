@@ -78,7 +78,7 @@ func TestDeleteUserFolderValid(t *testing.T) {
 	// so that proper access to storage is tested
 }
 
-func TestDeleteUserFolderInvalid(t *testing.T) {
+/*func TestDeleteUserFolderInvalid(t *testing.T) {
 	r := gin.Default()
 
 	r.POST("/folders/:id/:foldername/delete", deleteUserFolder)
@@ -97,4 +97,4 @@ func TestDeleteUserFolderInvalid(t *testing.T) {
 	// there should be a database call that looks for the
 	// folder name under that user and folder and
 	// should fail if neither is found
-}
+}*/
