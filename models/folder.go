@@ -26,7 +26,7 @@ type FolderStorage interface {
 	Delete(...FolderFilter) error
 }
 
-// FolderFilter is the set of critera that will be used to select certain
+// FolderFilter is the set of criteria that will be used to select certain
 // folders
 type FolderFilter func(*FolderFilterConfig) error
 
