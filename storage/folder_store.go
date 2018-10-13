@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"kne.st/models"
-	"strings"
-	"time"
+	//"strings"
+	//"time"
 
 	_ "github.com/lib/pq"
 )
@@ -13,88 +13,80 @@ import (
 // FolderStorage is the interface through which methods will access the database
 // in order to operate on folder objects.
 type FolderStorage interface {
-	List(...FolderFilter) ([]models.Folder, error)
-	Get(...FolderFilter) (models.Folder, error)
+	ListByUser(int) ([]models.Folder, error)
+	GetByName(int, string) (models.Folder, error)
 	Create(models.Folder) error
 	Update(models.Folder) error
-	Delete(...FolderFilter) error
-}
-
-// FolderFilter is the set of criteria that will be used to select certain
-// folders
-type FolderFilter func(*FolderFilterConfig) error
-
-// FolderFilterConfig is the struct that will be edited and then called by the
-// FolderFilter interface for searching.
-type FolderFilterConfig struct {
-	OwnerID    int
-	FolderName string
-	Created    time.Time
-	Completed  bool
-	Downloaded bool
+	Delete(int, string) error
 }
 
 type FolderStore struct {
 	db *sql.DB
 }
 
-// FolderOwnerIDFilter sets the ownerID field
-func FolderOwnerIDFilter(ownerID int) FolderFilter {
-	return func(fc *FolderFilterConfig) error {
-		fc.OwnerID = ownerID
-		return nil
+func (fs *FolderStore) ListByUser(ownerID int) ([]models.Folder, error) {
+	var folders []models.Folder
+
+	stmt, err := fs.db.Prepare(`select * from folders where owner_id = $N`)
+	if err != nil {
+		return []models.Folder{}, err
 	}
-}
 
-// FolderFolderNameFilter sets the folderName field
-func FolderFolderNameFilter(folderName string) FolderFilter {
-	return func(fc *FolderFilterConfig) error {
-		fc.FolderName = folderName
-		return nil
+	defer stmt.Close()
+
+	rows, err := stmt.Query(ownerID)
+
+	if err != nil {
+		return []models.Folder{}, err
 	}
-}
 
-// FolderCreatedFilter sets the created field
-func FolderCreatedFilter(created time.Time) FolderFilter {
-	return func(fc *FolderFilterConfig) error {
-		fc.Created = created
-		return nil
+	defer rows.Close()
+
+	for rows.Next() {
+		var f models.Folder
+		err = rows.Scan(&f.OwnerID, &f.FolderName, &f.FolderNameURL, &f.Created, &f.NumElements, &f.Completed, &f.Downloaded)
+
+		if err != nil {
+			return []models.Folder{}, err
+		}
+
+		folders = append(folders, f)
 	}
-}
 
-// FolderCompletedFilter sets the completed field
-func FolderCompletedFilter(completed bool) FolderFilter {
-	return func(fc *FolderFilterConfig) error {
-		fc.Completed = completed
-		return nil
+	if err = rows.Err(); err != nil {
+		return []models.Folder{}, err
 	}
+
+	return folders, nil
 }
 
-// FolderDownloadedFilter sets the downloaded field
-func FolderDownloadedFilter(downloaded bool) FolderFilter {
-	return func(fc *FolderFilterConfig) error {
-		fc.Downloaded = downloaded
-		return nil
+func (fs *FolderStore) GetByName(ownerID int, name string) (models.Folder, error) {
+	var f models.Folder
+
+	stmt, err := fs.db.Prepare(`select * from folders where owner_id = $1 and name = $2`)
+	if err != nil {
+		return models.Folder{}, err
 	}
-}
+	defer stmt.Close()
 
-func (fs *FolderStore) List(filters ...FolderFilter) ([]models.Folder, error) {
-	return nil, nil
-}
+	err = stmt.QueryRow(ownerID, name).Scan(&f.OwnerID, &f.FolderName,
+		&f.FolderNameURL, &f.Created, &f.NumElements, &f.Completed, &f.Downloaded)
+	if err != nil {
+		return models.Folder{}, err
+	}
 
-func (fs *FolderStore) Get(filters ...FolderFilter) (models.Folder, error) {
-	return models.Folder{}, nil
+	return f, nil
 }
 
 func (fs *FolderStore) Create(folder models.Folder) error {
 	return nil
 }
 
-func (fs *FolderStore) List(folder models.Folder) error {
+func (fs *FolderStore) Update(folder models.Folder) error {
 	return nil
 }
 
-func (fs *FolderStore) List(filters ...FolderFilter) error {
+func (fs *FolderStore) Delete(ownerID int, name string) error {
 	return nil
 }
 
