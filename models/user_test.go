@@ -30,7 +30,7 @@ func TestUsernameAvailability(t *testing.T) {
 		t.Fail()
 	}
 
-	u := User{"newone", "easypass", "New Person", "new@one.com", 1}
+	u := User{4, "newone", "easypass", "New Person", "new@one.com", 1}
 
 	// Add user to list of users
 	RegisterNewUser(u)
@@ -56,7 +56,7 @@ func TestEmailAvailability(t *testing.T) {
 		t.Fail()
 	}
 
-	u := User{"newone", "easypass", "New Person", "new@one.com", 1}
+	u := User{4, "newone", "easypass", "New Person", "new@one.com", 1}
 
 	// Add user to list of users
 	RegisterNewUser(u)
@@ -72,7 +72,7 @@ func TestEmailAvailability(t *testing.T) {
 func TestValidUserRegistration(t *testing.T) {
 	saveLists()
 
-	u := User{"newone", "easypass", "New Person", "new@one.com", 1}
+	u := User{4, "newone", "easypass", "New Person", "new@one.com", 1}
 
 	// Attempt to register new user
 	err := RegisterNewUser(u)
@@ -88,7 +88,7 @@ func TestValidUserRegistration(t *testing.T) {
 func TestInvalidUserRegistration(t *testing.T) {
 	saveLists()
 
-	uAlreadyTaken := User{"test1", "pass1", "Test OneGuy", "guy1@test.com", 1}
+	uAlreadyTaken := User{1, "test1", "pass1", "Test OneGuy", "guy1@test.com", 1}
 
 	// Attempt to register user already in database
 	errAlreadyTaken := RegisterNewUser(uAlreadyTaken)
@@ -98,7 +98,7 @@ func TestInvalidUserRegistration(t *testing.T) {
 		t.Fail()
 	}
 
-	uNoPass := User{"invalidtest", "", "Space Woman", "space@pass.com", 3}
+	uNoPass := User{5, "invalidtest", "", "Space Woman", "space@pass.com", 3}
 
 	// Attempt to register with no password
 	errNoPass := RegisterNewUser(uNoPass)

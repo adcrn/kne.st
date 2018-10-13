@@ -8,6 +8,7 @@ import (
 // User contains login credentials and details about their profile including
 // subscription type, which will dictate certain capabilities
 type User struct {
+	ID               int    `json:"id"`
 	Username         string `json:"username"`
 	Password         string `json:"password"`
 	FullName         string `json:"fullname"`
@@ -17,9 +18,9 @@ type User struct {
 
 // UserList should be populated from a database, but for prototyping, we'll define them here
 var UserList = []User{
-	{Username: "test1", Password: "pass1", FullName: "Test OneGuy", Email: "guy1@test.com", SubscriptionType: 1},
-	{Username: "test2", Password: "pass2", FullName: "Test TwoGal", Email: "gal2@test.com", SubscriptionType: 2},
-	{Username: "test3", Password: "pass3", FullName: "Test ThreeThey", Email: "they3@test.com", SubscriptionType: 3},
+	{ID: 1, Username: "test1", Password: "pass1", FullName: "Test OneGuy", Email: "guy1@test.com", SubscriptionType: 1},
+	{ID: 2, Username: "test2", Password: "pass2", FullName: "Test TwoGal", Email: "gal2@test.com", SubscriptionType: 2},
+	{ID: 3, Username: "test3", Password: "pass3", FullName: "Test ThreeThey", Email: "they3@test.com", SubscriptionType: 3},
 }
 
 // RegisterNewUser attempts to insert a new user into the database
