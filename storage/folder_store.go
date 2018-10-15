@@ -7,7 +7,7 @@ import (
 	//"strings"
 	//"time"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // Driver for database/sql
 )
 
 // FolderStorage is the interface through which methods will access the database
@@ -20,10 +20,12 @@ type FolderStorage interface {
 	Delete(int, string) error
 }
 
+// FolderStore allows for interaction with the database
 type FolderStore struct {
 	db *sql.DB
 }
 
+// ListByUser lists all folders that are tied to a particular user
 func (fs *FolderStore) ListByUser(ownerID int) ([]models.Folder, error) {
 	var folders []models.Folder
 
@@ -60,6 +62,7 @@ func (fs *FolderStore) ListByUser(ownerID int) ([]models.Folder, error) {
 	return folders, nil
 }
 
+// GetByName returns a single folder object given a user ID and a folder name
 func (fs *FolderStore) GetByName(ownerID int, name string) (models.Folder, error) {
 	var f models.Folder
 
@@ -78,18 +81,22 @@ func (fs *FolderStore) GetByName(ownerID int, name string) (models.Folder, error
 	return f, nil
 }
 
+// Create takes in a folder object and creates a database record
 func (fs *FolderStore) Create(folder models.Folder) error {
 	return nil
 }
 
+// Update should only be used to update the completed and downloaded fields
 func (fs *FolderStore) Update(folder models.Folder) error {
 	return nil
 }
 
+// Delete takes in a user Id and folder name and removes the folder record
 func (fs *FolderStore) Delete(ownerID int, name string) error {
 	return nil
 }
 
+// NewFolderStore returns a struct that implements the FolderStorage interface
 func NewFolderStore(db *sql.DB) FolderStorage {
 	return &FolderStore{db}
 }

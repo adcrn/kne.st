@@ -5,7 +5,7 @@ import (
 	"errors"
 	"kne.st/models"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // Driver for database/sql
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -20,11 +20,12 @@ type UserStorage interface {
 	Delete(int) error
 }
 
+// UserStore allows us to interact with the Postgres database
 type UserStore struct {
 	db *sql.DB
 }
 
-// Right now, this only filters by subscription type
+// ListBySubscriptionType returns all users with a certain subscription type
 func (us *UserStore) ListBySubscriptionType(subType int) ([]*models.User, error) {
 	var users []*models.User
 
@@ -65,6 +66,7 @@ func (us *UserStore) ListBySubscriptionType(subType int) ([]*models.User, error)
 	}
 }
 
+// GetByID returns a user database record given a user ID
 func (us *UserStore) GetByID(userID int) (models.User, error) {
 	var u models.User
 
@@ -82,6 +84,7 @@ func (us *UserStore) GetByID(userID int) (models.User, error) {
 	return u, nil
 }
 
+// GetByUsername returns a user database record given a username
 func (us *UserStore) GetByUsername(username string) (models.User, error) {
 	var u models.User
 
@@ -99,6 +102,7 @@ func (us *UserStore) GetByUsername(username string) (models.User, error) {
 	return u, nil
 }
 
+// Create takes a user object and creates a corresponding database record
 func (us *UserStore) Create(u models.User) (int, error) {
 	var userID int
 
@@ -136,7 +140,7 @@ func (us *UserStore) Create(u models.User) (int, error) {
 	return userID, nil
 }
 
-// For now, the user model should make sure that updates are not nil and such
+// Update uses the credential update struct and modies the user record
 func (us *UserStore) Update(u models.User, c models.CredentialUpdate) error {
 
 	newPass, err := bcrypt.GenerateFromPassword([]byte(c.Password), 10)
@@ -170,6 +174,7 @@ func (us *UserStore) Update(u models.User, c models.CredentialUpdate) error {
 	return nil
 }
 
+// Delete removes the corresponding user record from the database
 func (us *UserStore) Delete(userID int) error {
 
 	// Start transaction
@@ -199,6 +204,7 @@ func (us *UserStore) Delete(userID int) error {
 	return nil
 }
 
+// NewUserStore returns a struct that implements the UserStorage interface
 func NewUserStore(db *sql.DB) UserStorage {
 	return &UserStore{db}
 }
