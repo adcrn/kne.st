@@ -16,6 +16,7 @@ type User struct {
 	SubscriptionType int    `json:"sub_type"`
 }
 
+// CredentialUpdate allows for easy updating of user details
 type CredentialUpdate struct {
 	Password         string `json:"password"`
 	FullName         string `json:"fullname"`

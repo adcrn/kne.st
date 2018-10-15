@@ -61,9 +61,9 @@ func (us *UserStore) ListBySubscriptionType(subType int) ([]*models.User, error)
 
 	if err = rows.Err(); err != nil {
 		return []*models.User{}, err
-	} else {
-		return users, nil
 	}
+
+	return users, nil
 }
 
 // GetByID returns a user database record given a user ID
