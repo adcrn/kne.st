@@ -2,7 +2,7 @@ package storage
 
 import (
 	"database/sql"
-	"errors"
+	//"errors"
 	"kne.st/models"
 	//"strings"
 	//"time"
@@ -91,5 +91,5 @@ func (fs *FolderStore) Delete(ownerID int, name string) error {
 }
 
 func NewFolderStore(db *sql.DB) FolderStorage {
-	return &FolderStore(db)
+	return &FolderStore{db}
 }

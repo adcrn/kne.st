@@ -16,6 +16,13 @@ type User struct {
 	SubscriptionType int    `json:"sub_type"`
 }
 
+type CredentialUpdate struct {
+	Password         string `json:"password"`
+	FullName         string `json:"fullname"`
+	Email            string `json:"email"`
+	SubscriptionType int    `json:"sub_type"`
+}
+
 // UserList should be populated from a database, but for prototyping, we'll define them here
 var UserList = []User{
 	{ID: 1, Username: "test1", Password: "pass1", FullName: "Test OneGuy", Email: "guy1@test.com", SubscriptionType: 1},

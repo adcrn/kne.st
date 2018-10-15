@@ -16,8 +16,8 @@ type UserStorage interface {
 	GetByID(int) (models.User, error)
 	GetByUsername(string) (models.User, error)
 	Create(models.User) (int, error)
-	Update(models.User) error
-	Delete(int, string) error
+	Update(models.User, models.CredentialUpdate) error
+	Delete(int) error
 }
 
 type UserStore struct {
@@ -68,19 +68,16 @@ func (us *UserStore) ListBySubscriptionType(subType int) ([]*models.User, error)
 func (us *UserStore) GetByID(userID int) (models.User, error) {
 	var u models.User
 
-	stmt, err := us.db.Prepare(`select id, username, email, sub_type from users where id = $N`)
+	stmt, err := us.db.Prepare(`select * from users where id = $N`)
 	if err != nil {
 		return models.User{}, err
 	}
 	defer stmt.Close()
 
-	err = stmt.QueryRow(userID).Scan(&u.ID, &u.Username, &u.Email, &u.SubscriptionType)
+	err = stmt.QueryRow(userID).Scan(&u.ID, &u.Username, &u.Password, &u.FullName, &u.Email, &u.SubscriptionType)
 	if err != nil {
 		return models.User{}, err
 	}
-
-	u.Password = ""
-	u.FullName = ""
 
 	return u, nil
 }
@@ -88,19 +85,16 @@ func (us *UserStore) GetByID(userID int) (models.User, error) {
 func (us *UserStore) GetByUsername(username string) (models.User, error) {
 	var u models.User
 
-	stmt, err := us.db.Prepare(`select id, username, email, sub_type from users where username = $N`)
+	stmt, err := us.db.Prepare(`select * from users where username = $N`)
 	if err != nil {
 		return models.User{}, err
 	}
 	defer stmt.Close()
 
-	err = stmt.QueryRow(username).Scan(&u.ID, &u.Username, &u.Email, &u.SubscriptionType)
+	err = stmt.QueryRow(username).Scan(&u.ID, &u.Username, &u.Password, &u.FullName, &u.Email, &u.SubscriptionType)
 	if err != nil {
 		return models.User{}, err
 	}
-
-	u.Password = ""
-	u.FullName = ""
 
 	return u, nil
 }
@@ -128,7 +122,8 @@ func (us *UserStore) Create(u models.User) (int, error) {
 	}
 	defer stmt.Close()
 
-	err = stmt.QueryRow(u.Username, u.Password, u.FullName, u.Email, u.SubscriptionType).Scan(&userID)
+	// Make sure that the hashed password is stored instead of the actual one
+	err = stmt.QueryRow(u.Username, string(hashedPass), u.FullName, u.Email, u.SubscriptionType).Scan(&userID)
 	if err != nil {
 		return -1, errors.New("Unable to complete user creation query operation!")
 	}
@@ -141,12 +136,66 @@ func (us *UserStore) Create(u models.User) (int, error) {
 	return userID, nil
 }
 
-func (us *UserStore) Update(u models.User) error {
+// For now, the user model should make sure that updates are not nil and such
+func (us *UserStore) Update(u models.User, c models.CredentialUpdate) error {
+
+	newPass, err := bcrypt.GenerateFromPassword([]byte(c.Password), 10)
+	if err != nil {
+		return err
+	}
+
+	tx, err := us.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare(`update users set password = $1, full_name = $2, email = $3, sub_type = $4
+					where id = $5`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(string(newPass), c.FullName, c.Email, c.SubscriptionType, u.ID)
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-// Final check of password before deleting an account
-func (us *UserStore) Delete(userID int, password string) error {
+func (us *UserStore) Delete(userID int) error {
+
+	// Start transaction
+	tx, err := us.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare(`delete from users where id = $N`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	// Returns no rows so we just execute
+	_, err = stmt.Exec(userID)
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
