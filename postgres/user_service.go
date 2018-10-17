@@ -1,37 +1,26 @@
-package storage
+package postgres
 
 import (
 	"database/sql"
 	"errors"
-	"kne.st/models"
+	"github.com/adcrn/knest_web"
 
 	_ "github.com/lib/pq" // Driver for database/sql
 	"golang.org/x/crypto/bcrypt"
 )
 
-// UserStorage is the interface through which methods will access the database
-// in order to operate on user objects.
-type UserStorage interface {
-	ListBySubscriptionType(int) ([]*models.User, error)
-	GetByID(int) (models.User, error)
-	GetByUsername(string) (models.User, error)
-	Create(models.User) (int, error)
-	Update(models.User, models.CredentialUpdate) error
-	Delete(int) error
-}
-
-// UserStore allows us to interact with the Postgres database
-type UserStore struct {
+// UserService allows us to interact with the Postgres database
+type UserService struct {
 	db *sql.DB
 }
 
 // ListBySubscriptionType returns all users with a certain subscription type
-func (us *UserStore) ListBySubscriptionType(subType int) ([]*models.User, error) {
-	var users []*models.User
+func (us *UserService) ListBySubscriptionType(subType int) ([]*knest_web.User, error) {
+	var users []*knest_web.User
 
 	stmt, err := us.db.Prepare(`select id, username, email, sub_type from users where sub_type = $N`)
 	if err != nil {
-		return []*models.User{}, err
+		return []*knest_web.User{}, err
 	}
 
 	defer stmt.Close()
@@ -39,71 +28,73 @@ func (us *UserStore) ListBySubscriptionType(subType int) ([]*models.User, error)
 	rows, err := stmt.Query(subType)
 
 	if err != nil {
-		return []*models.User{}, err
+		return []*knest_web.User{}, err
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
-		var u models.User
+		var u knest_web.User
 		err = rows.Scan(&u.ID, &u.Username, &u.Email, &u.SubscriptionType)
 
 		if err != nil {
-			return []*models.User{}, err
+			return []*knest_web.User{}, err
 		}
 
 		// Don't need information like this being passed for this operation
 		u.Password = ""
-		u.FullName = ""
+		u.FirstName = ""
+		u.LastName = ""
 
 		users = append(users, &u)
 	}
 
 	if err = rows.Err(); err != nil {
-		return []*models.User{}, err
+		return []*knest_web.User{}, err
 	}
 
 	return users, nil
 }
 
 // GetByID returns a user database record given a user ID
-func (us *UserStore) GetByID(userID int) (models.User, error) {
-	var u models.User
+func (us *UserService) GetByID(userID int) (knest_web.User, error) {
+	var u knest_web.User
 
 	stmt, err := us.db.Prepare(`select * from users where id = $N`)
 	if err != nil {
-		return models.User{}, err
+		return knest_web.User{}, err
 	}
 	defer stmt.Close()
 
-	err = stmt.QueryRow(userID).Scan(&u.ID, &u.Username, &u.Password, &u.FullName, &u.Email, &u.SubscriptionType)
+	err = stmt.QueryRow(userID).Scan(&u.ID, &u.Username, &u.Password, &u.FirstName, &u.LastName, &u.Email, &u.SubscriptionType)
 	if err != nil {
-		return models.User{}, err
+		return knest_web.User{}, err
 	}
 
 	return u, nil
 }
 
 // GetByUsername returns a user database record given a username
-func (us *UserStore) GetByUsername(username string) (models.User, error) {
-	var u models.User
+func (us *UserService) GetByUsername(username string) (knest_web.User, error) {
+	var u knest_web.User
 
 	stmt, err := us.db.Prepare(`select * from users where username = $N`)
 	if err != nil {
-		return models.User{}, err
+		return knest_web.User{}, err
 	}
 	defer stmt.Close()
 
-	err = stmt.QueryRow(username).Scan(&u.ID, &u.Username, &u.Password, &u.FullName, &u.Email, &u.SubscriptionType)
+	err = stmt.QueryRow(username).Scan(&u.ID, &u.Username, &u.Password, &u.FirstName, &u.LastName,
+		&u.Email, &u.SubscriptionType)
 	if err != nil {
-		return models.User{}, err
+		return knest_web.User{}, err
 	}
 
 	return u, nil
 }
 
 // Create takes a user object and creates a corresponding database record
-func (us *UserStore) Create(u models.User) (int, error) {
+func (us *UserService) Create(u knest_web.User) (int, error) {
 	var userID int
 
 	// Salt and hash the password for storage in database
@@ -119,15 +110,15 @@ func (us *UserStore) Create(u models.User) (int, error) {
 	}
 	defer tx.Rollback()
 
-	stmt, err := tx.Prepare(`insert into users(username, password, full_name, email, sub_type)
-					values($1, $2, $3, $4, $5) RETURNING id`)
+	stmt, err := tx.Prepare(`insert into users(username, password, first_name, last_name, email, sub_type)
+					values($1, $2, $3, $4, $5, $6) RETURNING id`)
 	if err != nil {
 		return -1, errors.New("Unable to complete user creation statement preparation!")
 	}
 	defer stmt.Close()
 
 	// Make sure that the hashed password is stored instead of the actual one
-	err = stmt.QueryRow(u.Username, string(hashedPass), u.FullName, u.Email, u.SubscriptionType).Scan(&userID)
+	err = stmt.QueryRow(u.Username, string(hashedPass), u.FirstName, u.LastName, u.Email, u.SubscriptionType).Scan(&userID)
 	if err != nil {
 		return -1, errors.New("Unable to complete user creation query operation!")
 	}
@@ -141,7 +132,7 @@ func (us *UserStore) Create(u models.User) (int, error) {
 }
 
 // Update uses the credential update struct and modies the user record
-func (us *UserStore) Update(u models.User, c models.CredentialUpdate) error {
+func (us *UserService) Update(u knest_web.User, c knest_web.CredentialUpdate) error {
 
 	newPass, err := bcrypt.GenerateFromPassword([]byte(c.Password), 10)
 	if err != nil {
@@ -161,7 +152,7 @@ func (us *UserStore) Update(u models.User, c models.CredentialUpdate) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(string(newPass), c.FullName, c.Email, c.SubscriptionType, u.ID)
+	_, err = stmt.Exec(string(newPass), c.FirstName, c.LastName, c.Email, c.SubscriptionType, u.ID)
 	if err != nil {
 		return err
 	}
@@ -175,7 +166,7 @@ func (us *UserStore) Update(u models.User, c models.CredentialUpdate) error {
 }
 
 // Delete removes the corresponding user record from the database
-func (us *UserStore) Delete(userID int) error {
+func (us *UserService) Delete(userID int) error {
 
 	// Start transaction
 	tx, err := us.db.Begin()
@@ -204,7 +195,7 @@ func (us *UserStore) Delete(userID int) error {
 	return nil
 }
 
-// NewUserStore returns a struct that implements the UserStorage interface
-func NewUserStore(db *sql.DB) UserStorage {
-	return &UserStore{db}
+// NewUserService returns a struct that implements the UserService interface
+func NewUserService(db *sql.DB) UserService {
+	return &UserService{db}
 }

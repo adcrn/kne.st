@@ -1,35 +1,35 @@
-package storage
+package postgres
 
 import (
 	"database/sql"
-	"kne.st/models"
+	"github.com/adcrn/knest_web"
 	"time"
 
 	_ "github.com/lib/pq" // Driver for database/sql
 )
 
-// FolderStorage is the interface through which methods will access the database
+// FolderService is the interface through which methods will access the database
 // in order to operate on folder objects.
-type FolderStorage interface {
-	ListByUser(int) ([]models.Folder, error)
-	GetByName(int, string) (models.Folder, error)
-	Create(models.Folder) (int, error)
-	Update(models.Folder, models.FolderUpdate) error
+type FolderService interface {
+	ListByUser(int) ([]knest_web.Folder, error)
+	GetByName(int, string) (knest_web.Folder, error)
+	Create(knest_web.Folder) (int, error)
+	Update(knest_web.Folder, knest_web.FolderUpdate) error
 	Delete(int, string) error
 }
 
-// FolderStore allows for interaction with the database
-type FolderStore struct {
+// FolderService allows for interaction with the database
+type FolderService struct {
 	db *sql.DB
 }
 
 // ListByUser lists all folders that are tied to a particular user
-func (fs *FolderStore) ListByUser(ownerID int) ([]models.Folder, error) {
-	var folders []models.Folder
+func (fs *FolderService) ListByUser(ownerID int) ([]knest_web.Folder, error) {
+	var folders []knest_web.Folder
 
 	stmt, err := fs.db.Prepare(`select * from folders where owner_id = $N`)
 	if err != nil {
-		return []models.Folder{}, err
+		return []knest_web.Folder{}, err
 	}
 
 	defer stmt.Close()
@@ -37,50 +37,50 @@ func (fs *FolderStore) ListByUser(ownerID int) ([]models.Folder, error) {
 	rows, err := stmt.Query(ownerID)
 
 	if err != nil {
-		return []models.Folder{}, err
+		return []knest_web.Folder{}, err
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
-		var f models.Folder
-		err = rows.Scan(&f.OwnerID, &f.FolderName, &f.FolderNameURL, &f.Created, &f.NumElements, &f.Completed, &f.Downloaded)
+		var f knest_web.Folder
+		err = rows.Scan(&f.OwnerID, &f.FolderName, &f.S3Path, &f.UploadTime, &f.NumElements, &f.Completed, &f.Downloaded)
 
 		if err != nil {
-			return []models.Folder{}, err
+			return []knest_web.Folder{}, err
 		}
 
 		folders = append(folders, f)
 	}
 
 	if err = rows.Err(); err != nil {
-		return []models.Folder{}, err
+		return []knest_web.Folder{}, err
 	}
 
 	return folders, nil
 }
 
 // GetByName returns a single folder object given a user ID and a folder name
-func (fs *FolderStore) GetByName(ownerID int, name string) (models.Folder, error) {
-	var f models.Folder
+func (fs *FolderService) GetByName(ownerID int, name string) (knest_web.Folder, error) {
+	var f knest_web.Folder
 
 	stmt, err := fs.db.Prepare(`select * from folders where owner_id = $1 and name = $2`)
 	if err != nil {
-		return models.Folder{}, err
+		return knest_web.Folder{}, err
 	}
 	defer stmt.Close()
 
 	err = stmt.QueryRow(ownerID, name).Scan(&f.OwnerID, &f.FolderName,
-		&f.FolderNameURL, &f.Created, &f.NumElements, &f.Completed, &f.Downloaded)
+		&f.S3Path, &f.UploadTime, &f.NumElements, &f.Completed, &f.Downloaded)
 	if err != nil {
-		return models.Folder{}, err
+		return knest_web.Folder{}, err
 	}
 
 	return f, nil
 }
 
 // Create takes in a folder object and creates a database record
-func (fs *FolderStore) Create(f models.Folder) (int, error) {
+func (fs *FolderService) Create(f knest_web.Folder) (int, error) {
 	var folderID int
 	const sqlTimeFormat = "1993-01-05 23:45:00"
 
@@ -112,7 +112,7 @@ func (fs *FolderStore) Create(f models.Folder) (int, error) {
 }
 
 // Update should only be used to update the completed and downloaded fields
-func (fs *FolderStore) Update(f models.Folder, up models.FolderUpdate) error {
+func (fs *FolderService) Update(f knest_web.Folder, up knest_web.FolderUpdate) error {
 
 	tx, err := fs.db.Begin()
 	if err != nil {
@@ -140,7 +140,7 @@ func (fs *FolderStore) Update(f models.Folder, up models.FolderUpdate) error {
 }
 
 // Delete takes in a user Id and folder name and removes the folder record
-func (fs *FolderStore) Delete(ownerID int, name string) error {
+func (fs *FolderService) Delete(ownerID int, name string) error {
 
 	tx, err := fs.db.Begin()
 	if err != nil {
@@ -167,7 +167,7 @@ func (fs *FolderStore) Delete(ownerID int, name string) error {
 	return nil
 }
 
-// NewFolderStore returns a struct that implements the FolderStorage interface
-func NewFolderStore(db *sql.DB) FolderStorage {
-	return &FolderStore{db}
+// NewFolderService returns a struct that implements the FolderService interface
+func NewFolderService(db *sql.DB) FolderService {
+	return &FolderService{db}
 }
