@@ -2,8 +2,7 @@ package postgres
 
 import (
 	"database/sql"
-	"errors"
-	"github.com/adcrn/knest_web"
+	"github.com/adcrn/webknest"
 
 	_ "github.com/lib/pq" // Driver for database/sql
 	"golang.org/x/crypto/bcrypt"
@@ -15,12 +14,12 @@ type UserService struct {
 }
 
 // ListBySubscriptionType returns all users with a certain subscription type
-func (us *UserService) ListBySubscriptionType(subType int) ([]*knest_web.User, error) {
-	var users []*knest_web.User
+func (us *UserService) ListBySubscriptionType(subType int) ([]*webknest.User, error) {
+	var users []*webknest.User
 
 	stmt, err := us.db.Prepare(`select id, username, email, sub_type from users where sub_type = $N`)
 	if err != nil {
-		return []*knest_web.User{}, err
+		return []*webknest.User{}, err
 	}
 
 	defer stmt.Close()
@@ -28,17 +27,17 @@ func (us *UserService) ListBySubscriptionType(subType int) ([]*knest_web.User, e
 	rows, err := stmt.Query(subType)
 
 	if err != nil {
-		return []*knest_web.User{}, err
+		return []*webknest.User{}, err
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
-		var u knest_web.User
+		var u webknest.User
 		err = rows.Scan(&u.ID, &u.Username, &u.Email, &u.SubscriptionType)
 
 		if err != nil {
-			return []*knest_web.User{}, err
+			return []*webknest.User{}, err
 		}
 
 		// Don't need information like this being passed for this operation
@@ -50,51 +49,51 @@ func (us *UserService) ListBySubscriptionType(subType int) ([]*knest_web.User, e
 	}
 
 	if err = rows.Err(); err != nil {
-		return []*knest_web.User{}, err
+		return []*webknest.User{}, err
 	}
 
 	return users, nil
 }
 
 // GetByID returns a user database record given a user ID
-func (us *UserService) GetByID(userID int) (knest_web.User, error) {
-	var u knest_web.User
+func (us *UserService) GetByID(userID int) (webknest.User, error) {
+	var u webknest.User
 
 	stmt, err := us.db.Prepare(`select * from users where id = $N`)
 	if err != nil {
-		return knest_web.User{}, err
+		return webknest.User{}, err
 	}
 	defer stmt.Close()
 
 	err = stmt.QueryRow(userID).Scan(&u.ID, &u.Username, &u.Password, &u.FirstName, &u.LastName, &u.Email, &u.SubscriptionType)
 	if err != nil {
-		return knest_web.User{}, err
+		return webknest.User{}, err
 	}
 
 	return u, nil
 }
 
 // GetByUsername returns a user database record given a username
-func (us *UserService) GetByUsername(username string) (knest_web.User, error) {
-	var u knest_web.User
+func (us *UserService) GetByUsername(username string) (webknest.User, error) {
+	var u webknest.User
 
 	stmt, err := us.db.Prepare(`select * from users where username = $N`)
 	if err != nil {
-		return knest_web.User{}, err
+		return webknest.User{}, err
 	}
 	defer stmt.Close()
 
 	err = stmt.QueryRow(username).Scan(&u.ID, &u.Username, &u.Password, &u.FirstName, &u.LastName,
 		&u.Email, &u.SubscriptionType)
 	if err != nil {
-		return knest_web.User{}, err
+		return webknest.User{}, err
 	}
 
 	return u, nil
 }
 
 // Create takes a user object and creates a corresponding database record
-func (us *UserService) Create(u knest_web.User) (int, error) {
+func (us *UserService) Create(u webknest.User) (int, error) {
 	var userID int
 
 	// Salt and hash the password for storage in database
@@ -106,33 +105,33 @@ func (us *UserService) Create(u knest_web.User) (int, error) {
 	// Start transaction
 	tx, err := us.db.Begin()
 	if err != nil {
-		return -1, errors.New("Unable to begin user creation transaction!")
+		return -1, err
 	}
 	defer tx.Rollback()
 
 	stmt, err := tx.Prepare(`insert into users(username, password, first_name, last_name, email, sub_type)
 					values($1, $2, $3, $4, $5, $6) RETURNING id`)
 	if err != nil {
-		return -1, errors.New("Unable to complete user creation statement preparation!")
+		return -1, err
 	}
 	defer stmt.Close()
 
 	// Make sure that the hashed password is stored instead of the actual one
 	err = stmt.QueryRow(u.Username, string(hashedPass), u.FirstName, u.LastName, u.Email, u.SubscriptionType).Scan(&userID)
 	if err != nil {
-		return -1, errors.New("Unable to complete user creation query operation!")
+		return -1, err
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return -1, errors.New("Unable to commit user creation transaction!")
+		return -1, err
 	}
 
 	return userID, nil
 }
 
 // Update uses the credential update struct and modies the user record
-func (us *UserService) Update(u knest_web.User, c knest_web.CredentialUpdate) error {
+func (us *UserService) Update(u webknest.User, c webknest.CredentialUpdate) error {
 
 	newPass, err := bcrypt.GenerateFromPassword([]byte(c.Password), 10)
 	if err != nil {
@@ -193,9 +192,4 @@ func (us *UserService) Delete(userID int) error {
 	}
 
 	return nil
-}
-
-// NewUserService returns a struct that implements the UserService interface
-func NewUserService(db *sql.DB) UserService {
-	return &UserService{db}
 }

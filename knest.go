@@ -1,13 +1,15 @@
-package knest_web
+package webknest
 
 import (
 	"time"
 )
 
+// User contains login credentials and details about their profile including
+// subscription type, which will dictate certain capabilities
 type User struct {
 	ID               int    `json:"id"`
 	Username         string `json:"username"`
-	Password         string `json:"password"`
+	Password         string `json:"-"`
 	FirstName        string `json:"first_name"`
 	LastName         string `json:"last_name"`
 	Email            string `json:"email"`
@@ -23,6 +25,8 @@ type CredentialUpdate struct {
 	SubscriptionType int    `json:"sub_type"`
 }
 
+// UserService is the interface through which the handlers will interact with
+// the user data model
 type UserService interface {
 	ListBySubscriptionType(int) ([]*User, error)
 	GetByID(int) (*User, error)
@@ -32,6 +36,7 @@ type UserService interface {
 	Delete(int) error
 }
 
+// Folder is the main construct that will associated with users.
 type Folder struct {
 	OwnerID     int       `json:"owner"`
 	FolderName  string    `json:"foldername"`
@@ -48,7 +53,9 @@ type FolderUpdate struct {
 	Downloaded bool `json:"downloaded"`
 }
 
-type FolderStorage interface {
+// FolderService is the interface through which the handlers will interact with
+// the folder data model
+type FolderService interface {
 	ListByUser(int) (*Folder, error)
 	GetByName(int, string) (*Folder, error)
 	Create(*Folder) (int, error)

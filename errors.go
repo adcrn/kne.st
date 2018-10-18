@@ -1,4 +1,4 @@
-package knest_web
+package webknest
 
 // General errors
 const (

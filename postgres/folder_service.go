@@ -2,21 +2,11 @@ package postgres
 
 import (
 	"database/sql"
-	"github.com/adcrn/knest_web"
+	"github.com/adcrn/webknest"
 	"time"
 
 	_ "github.com/lib/pq" // Driver for database/sql
 )
-
-// FolderService is the interface through which methods will access the database
-// in order to operate on folder objects.
-type FolderService interface {
-	ListByUser(int) ([]knest_web.Folder, error)
-	GetByName(int, string) (knest_web.Folder, error)
-	Create(knest_web.Folder) (int, error)
-	Update(knest_web.Folder, knest_web.FolderUpdate) error
-	Delete(int, string) error
-}
 
 // FolderService allows for interaction with the database
 type FolderService struct {
@@ -24,12 +14,12 @@ type FolderService struct {
 }
 
 // ListByUser lists all folders that are tied to a particular user
-func (fs *FolderService) ListByUser(ownerID int) ([]knest_web.Folder, error) {
-	var folders []knest_web.Folder
+func (fs *FolderService) ListByUser(ownerID int) ([]webknest.Folder, error) {
+	var folders []webknest.Folder
 
 	stmt, err := fs.db.Prepare(`select * from folders where owner_id = $N`)
 	if err != nil {
-		return []knest_web.Folder{}, err
+		return []webknest.Folder{}, err
 	}
 
 	defer stmt.Close()
@@ -37,50 +27,50 @@ func (fs *FolderService) ListByUser(ownerID int) ([]knest_web.Folder, error) {
 	rows, err := stmt.Query(ownerID)
 
 	if err != nil {
-		return []knest_web.Folder{}, err
+		return []webknest.Folder{}, err
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
-		var f knest_web.Folder
+		var f webknest.Folder
 		err = rows.Scan(&f.OwnerID, &f.FolderName, &f.S3Path, &f.UploadTime, &f.NumElements, &f.Completed, &f.Downloaded)
 
 		if err != nil {
-			return []knest_web.Folder{}, err
+			return []webknest.Folder{}, err
 		}
 
 		folders = append(folders, f)
 	}
 
 	if err = rows.Err(); err != nil {
-		return []knest_web.Folder{}, err
+		return []webknest.Folder{}, err
 	}
 
 	return folders, nil
 }
 
 // GetByName returns a single folder object given a user ID and a folder name
-func (fs *FolderService) GetByName(ownerID int, name string) (knest_web.Folder, error) {
-	var f knest_web.Folder
+func (fs *FolderService) GetByName(ownerID int, name string) (webknest.Folder, error) {
+	var f webknest.Folder
 
 	stmt, err := fs.db.Prepare(`select * from folders where owner_id = $1 and name = $2`)
 	if err != nil {
-		return knest_web.Folder{}, err
+		return webknest.Folder{}, err
 	}
 	defer stmt.Close()
 
 	err = stmt.QueryRow(ownerID, name).Scan(&f.OwnerID, &f.FolderName,
 		&f.S3Path, &f.UploadTime, &f.NumElements, &f.Completed, &f.Downloaded)
 	if err != nil {
-		return knest_web.Folder{}, err
+		return webknest.Folder{}, err
 	}
 
 	return f, nil
 }
 
 // Create takes in a folder object and creates a database record
-func (fs *FolderService) Create(f knest_web.Folder) (int, error) {
+func (fs *FolderService) Create(f webknest.Folder) (int, error) {
 	var folderID int
 	const sqlTimeFormat = "1993-01-05 23:45:00"
 
@@ -112,7 +102,7 @@ func (fs *FolderService) Create(f knest_web.Folder) (int, error) {
 }
 
 // Update should only be used to update the completed and downloaded fields
-func (fs *FolderService) Update(f knest_web.Folder, up knest_web.FolderUpdate) error {
+func (fs *FolderService) Update(f webknest.Folder, up webknest.FolderUpdate) error {
 
 	tx, err := fs.db.Begin()
 	if err != nil {
@@ -165,9 +155,4 @@ func (fs *FolderService) Delete(ownerID int, name string) error {
 	}
 
 	return nil
-}
-
-// NewFolderService returns a struct that implements the FolderService interface
-func NewFolderService(db *sql.DB) FolderService {
-	return &FolderService{db}
 }
