@@ -10,14 +10,14 @@ import (
 
 // UserService allows us to interact with the Postgres database
 type UserService struct {
-	db *sql.DB
+	DB *sql.DB
 }
 
 // ListBySubscriptionType returns all users with a certain subscription type
 func (us *UserService) ListBySubscriptionType(subType int) ([]*webknest.User, error) {
 	var users []*webknest.User
 
-	stmt, err := us.db.Prepare(`select id, username, email, sub_type from users where sub_type = $N`)
+	stmt, err := us.DB.Prepare(`select id, username, email, sub_type from users where sub_type = $N`)
 	if err != nil {
 		return []*webknest.User{}, err
 	}
@@ -59,7 +59,7 @@ func (us *UserService) ListBySubscriptionType(subType int) ([]*webknest.User, er
 func (us *UserService) GetByID(userID int) (webknest.User, error) {
 	var u webknest.User
 
-	stmt, err := us.db.Prepare(`select * from users where id = $N`)
+	stmt, err := us.DB.Prepare(`select * from users where id = $N`)
 	if err != nil {
 		return webknest.User{}, err
 	}
@@ -77,7 +77,7 @@ func (us *UserService) GetByID(userID int) (webknest.User, error) {
 func (us *UserService) GetByUsername(username string) (webknest.User, error) {
 	var u webknest.User
 
-	stmt, err := us.db.Prepare(`select * from users where username = $N`)
+	stmt, err := us.DB.Prepare(`select * from users where username = $N`)
 	if err != nil {
 		return webknest.User{}, err
 	}
@@ -103,7 +103,7 @@ func (us *UserService) Create(u webknest.User) (int, error) {
 	}
 
 	// Start transaction
-	tx, err := us.db.Begin()
+	tx, err := us.DB.Begin()
 	if err != nil {
 		return -1, err
 	}
@@ -138,7 +138,7 @@ func (us *UserService) Update(u webknest.User, c webknest.CredentialUpdate) erro
 		return err
 	}
 
-	tx, err := us.db.Begin()
+	tx, err := us.DB.Begin()
 	if err != nil {
 		return err
 	}
@@ -168,7 +168,7 @@ func (us *UserService) Update(u webknest.User, c webknest.CredentialUpdate) erro
 func (us *UserService) Delete(userID int) error {
 
 	// Start transaction
-	tx, err := us.db.Begin()
+	tx, err := us.DB.Begin()
 	if err != nil {
 		return err
 	}

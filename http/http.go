@@ -2,16 +2,22 @@ package http
 
 import (
 	"github.com/adcrn/webknest"
+	"github.com/adcrn/webknest/postgres"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
+
+type Handler struct {
+	UserHandler
+	FolderHandler
+}
 
 // UserHandler implements the UserService interface along with a router and
 // logger in order to work with requests from the frontend for user data
 type UserHandler struct {
 	*gin.Engine
 
-	UserService webknest.UserService
+	UserService *postgres.UserService
 
 	Logger gin.HandlerFunc
 }
@@ -21,7 +27,7 @@ type UserHandler struct {
 type FolderHandler struct {
 	*gin.Engine
 
-	FolderService webknest.FolderService
+	FolderService *postgres.FolderService
 
 	Logger gin.HandlerFunc
 }
@@ -65,7 +71,7 @@ func NewFolderHandler() *FolderHandler {
 // details are taken and passed to the UserService interface.
 func (h *UserHandler) register(c *gin.Context) {
 
-	var u *webknest.User
+	var u webknest.User
 	if err := c.BindJSON(&u); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 	}

@@ -10,14 +10,14 @@ import (
 
 // FolderService allows for interaction with the database
 type FolderService struct {
-	db *sql.DB
+	DB *sql.DB
 }
 
 // ListByUser lists all folders that are tied to a particular user
 func (fs *FolderService) ListByUser(ownerID int) ([]webknest.Folder, error) {
 	var folders []webknest.Folder
 
-	stmt, err := fs.db.Prepare(`select * from folders where owner_id = $N`)
+	stmt, err := fs.DB.Prepare(`select * from folders where owner_id = $N`)
 	if err != nil {
 		return []webknest.Folder{}, err
 	}
@@ -54,7 +54,7 @@ func (fs *FolderService) ListByUser(ownerID int) ([]webknest.Folder, error) {
 func (fs *FolderService) GetByName(ownerID int, name string) (webknest.Folder, error) {
 	var f webknest.Folder
 
-	stmt, err := fs.db.Prepare(`select * from folders where owner_id = $1 and name = $2`)
+	stmt, err := fs.DB.Prepare(`select * from folders where owner_id = $1 and name = $2`)
 	if err != nil {
 		return webknest.Folder{}, err
 	}
@@ -74,7 +74,7 @@ func (fs *FolderService) Create(f webknest.Folder) (int, error) {
 	var folderID int
 	const sqlTimeFormat = "1993-01-05 23:45:00"
 
-	tx, err := fs.db.Begin()
+	tx, err := fs.DB.Begin()
 	if err != nil {
 		return -1, err
 	}
@@ -104,7 +104,7 @@ func (fs *FolderService) Create(f webknest.Folder) (int, error) {
 // Update should only be used to update the completed and downloaded fields
 func (fs *FolderService) Update(f webknest.Folder, up webknest.FolderUpdate) error {
 
-	tx, err := fs.db.Begin()
+	tx, err := fs.DB.Begin()
 	if err != nil {
 		return err
 	}
@@ -132,7 +132,7 @@ func (fs *FolderService) Update(f webknest.Folder, up webknest.FolderUpdate) err
 // Delete takes in a user Id and folder name and removes the folder record
 func (fs *FolderService) Delete(ownerID int, name string) error {
 
-	tx, err := fs.db.Begin()
+	tx, err := fs.DB.Begin()
 	if err != nil {
 		return err
 	}
