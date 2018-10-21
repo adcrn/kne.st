@@ -4,9 +4,11 @@ import (
 	"github.com/adcrn/webknest"
 	"github.com/adcrn/webknest/postgres"
 	"github.com/gin-gonic/gin"
+	//"golang.org/x/crypto/bcrypt"
 	"strconv"
 )
 
+// Handler holds the subhandlers, may change later.
 type Handler struct {
 	UserHandler
 	FolderHandler
@@ -61,6 +63,7 @@ func NewFolderHandler() *FolderHandler {
 		h.GET("/:id", h.fetchUserFolders)
 		h.GET("/:id/:foldername", h.getFolderRecord)
 		h.POST("/:id/:foldername/delete", h.deleteFolderRecord)
+		h.POST("/:id/:foldername/update", h.updateFolderRecord)
 		h.POST("/:id/upload", h.createFolderRecord)
 	}
 
@@ -100,10 +103,57 @@ func (h *UserHandler) register(c *gin.Context) {
 }
 
 func (h *UserHandler) getUserInfo(c *gin.Context) {
+	var u webknest.User
+	userID, err := strconv.Atoi(c.Param("id")[1:])
 
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Bad user ID"})
+	}
+
+	u, err = h.UserService.GetByID(userID)
+
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(200, u)
 }
 
 func (h *UserHandler) updateUserInfo(c *gin.Context) {
+	userID, _ := strconv.Atoi(c.Param("id"))
+	pass := c.Param("password")
+	firstName := c.Param("first_name")
+	lastName := c.Param("last_name")
+	email := c.Param("email")
+	subType, _ := strconv.Atoi(c.Param("sub_type"))
+
+	var u webknest.User
+
+	u, err := h.UserService.GetByID(userID)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	// Should probably break out password changes into their own function, will
+	// do soon
+	if pass == "" {
+		pass = u.Password
+	}
+
+	cu := webknest.CredentialUpdate{
+		Password:         pass,
+		FirstName:        firstName,
+		LastName:         lastName,
+		Email:            email,
+		SubscriptionType: subType,
+	}
+
+	err = h.UserService.Update(u, cu)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(204, gin.H{"response": "Update successful"})
 
 }
 
@@ -169,7 +219,21 @@ func (h *FolderHandler) fetchUserFolders(c *gin.Context) {
 }
 
 func (h *FolderHandler) getFolderRecord(c *gin.Context) {
+	var f webknest.Folder
 
+	userID, err := strconv.Atoi(c.Param("id")[1:])
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	folderName := c.Param("foldername")[1:]
+
+	f, err = h.FolderService.GetByName(userID, folderName)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(200, f)
 }
 
 func (h *FolderHandler) createFolderRecord(c *gin.Context) {
@@ -212,4 +276,7 @@ func (h *FolderHandler) deleteFolderRecord(c *gin.Context) {
 			"response": "success",
 		},
 	)
+}
+
+func (h *FolderHandler) updateFolderRecord(c *gin.Context) {
 }
