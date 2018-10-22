@@ -130,13 +130,8 @@ func (us *UserService) Create(u webknest.User) (int, error) {
 	return userID, nil
 }
 
-// Update uses the credential update struct and modies the user record
-func (us *UserService) Update(u webknest.User, c webknest.CredentialUpdate) error {
-
-	newPass, err := bcrypt.GenerateFromPassword([]byte(c.Password), 10)
-	if err != nil {
-		return err
-	}
+// UpdateDetails uses the detail update struct and modifies the user record
+func (us *UserService) UpdateDetails(u webknest.User, du webknest.DetailUpdate) error {
 
 	tx, err := us.DB.Begin()
 	if err != nil {
@@ -144,14 +139,14 @@ func (us *UserService) Update(u webknest.User, c webknest.CredentialUpdate) erro
 	}
 	defer tx.Rollback()
 
-	stmt, err := tx.Prepare(`update users set password = $1, full_name = $2, email = $3, sub_type = $4
-					where id = $5`)
+	stmt, err := tx.Prepare(`update users set first_name = $1, last_name = $2, sub_type = $3
+					where id = $4`)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(string(newPass), c.FirstName, c.LastName, c.Email, c.SubscriptionType, u.ID)
+	_, err = stmt.Exec(du.FirstName, du.LastName, du.SubscriptionType, u.ID)
 	if err != nil {
 		return err
 	}
@@ -161,6 +156,17 @@ func (us *UserService) Update(u webknest.User, c webknest.CredentialUpdate) erro
 		return err
 	}
 
+	return nil
+}
+
+// ChangePassword changes the password by checking the supplied current
+// password and if it passes, then the password is changed to the new one
+func (us *UserService) ChangePassword(userID int, currentPass, newPass string) error {
+	return nil
+}
+
+// ChangeEmail allows for the easy emodication of email records
+func (us *UserService) ChangeEmail(userID int, newEmail string) error {
 	return nil
 }
 

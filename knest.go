@@ -16,12 +16,10 @@ type User struct {
 	SubscriptionType int    `json:"sub_type"`
 }
 
-// CredentialUpdate allows for easy updating of user details
-type CredentialUpdate struct {
-	Password         string `json:"password"`
+// DetailUpdate allows for easy updating of user details
+type DetailUpdate struct {
 	FirstName        string `json:"first_name"`
 	LastName         string `json:"last_name"`
-	Email            string `json:"email"`
 	SubscriptionType int    `json:"sub_type"`
 }
 
@@ -32,7 +30,9 @@ type UserService interface {
 	GetByID(int) (*User, error)
 	GetByUsername(string) (*User, error)
 	Create(*User) (int, error)
-	Update(*User, *CredentialUpdate) error
+	UpdateDetails(*User, *DetailUpdate) error
+	ChangePassword(int, string, string) error
+	ChangeEmail(int, string) error
 	Delete(int) error
 }
 

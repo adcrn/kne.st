@@ -30,6 +30,8 @@ func NewHandler() *Handler {
 		{
 			h.GET("/:id/get", h.getUserInfo)
 			h.POST("/:id/update", h.updateUserInfo)
+			h.POST("/:id/changepass", h.changePassword)
+			h.POST("/:id/changeemai", h.changeEmail)
 		}
 		h.Group("/f")
 		{
@@ -96,30 +98,30 @@ func (h *Handler) getUserInfo(c *gin.Context) {
 func (h *Handler) updateUserInfo(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Param("id"))
 	var u webknest.User
-	var cu webknest.CredentialUpdate
+	var du webknest.DetailUpdate
 
 	u, err := h.UserService.GetByID(userID)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 	}
 
-	if err = c.BindJSON(&cu); err != nil {
+	if err = c.BindJSON(&du); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 	}
 
-	// Should probably break out password changes into their own function, will
-	// do soon
-	if cu.Password == "" {
-		cu.Password = u.Password
-	}
-
-	err = h.UserService.Update(u, cu)
+	err = h.UserService.UpdateDetails(u, du)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 	}
 
 	c.JSON(204, gin.H{"response": "Update successful"})
 
+}
+
+func (h *Handler) changePassword(c *gin.Context) {
+}
+
+func (h *Handler) changeEmail(c *gin.Context) {
 }
 
 // showIndexPage will return the home page of the website when the user
