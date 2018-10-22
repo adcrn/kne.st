@@ -97,7 +97,7 @@ func (us *UserService) Create(u webknest.User) (int, error) {
 	var userID int
 
 	// Salt and hash the password for storage in database
-	hashedPass, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return -1, err
 	}
@@ -161,7 +161,51 @@ func (us *UserService) UpdateDetails(u webknest.User, du webknest.DetailUpdate) 
 
 // ChangePassword changes the password by checking the supplied current
 // password and if it passes, then the password is changed to the new one
-func (us *UserService) ChangePassword(userID int, currentPass, newPass string) error {
+func (us *UserService) ChangePassword(userID int, pu webknest.PasswordUpdate) error {
+	var passFromDB string
+	stmt, err := us.DB.Prepare(`select password from users where id = $N`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(userID).Scan(&passFromDB)
+	if err != nil {
+		return err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(passFromDB), []byte(pu.CurrentPassword))
+	if err != nil {
+		return err
+	}
+
+	newHash, err := bcrypt.GenerateFromPassword([]byte(pu.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	tx, err := us.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt2, err := tx.Prepare(`update users set password = $1 where id = $2`)
+	if err != nil {
+		return err
+	}
+	defer stmt2.Close()
+
+	_, err = stmt2.Exec(string(newHash), userID)
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

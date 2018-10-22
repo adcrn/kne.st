@@ -1,12 +1,10 @@
 # kne.st
 [![Go Report Card](https://goreportcard.com/badge/github.com/adcrn/kne.st)](https://goreportcard.com/report/github.com/adcrn/kne.st)
-A web application codebase for a possible subscription service-based version of knest.
+
+Backend for a possible SaaS offering of [knest](https://github.com/adcrn/knest).
 
 ## Building
 `go build -o knest`
-
-## Testing
-`go test -v ./...`
 
 ## Usage
 Start the server by running `./knest` and then direct a browser to
@@ -23,6 +21,9 @@ Start the server by running `./knest` and then direct a browser to
   photos
 
 ## Current Progress
-The backend API is being hashed out in piecemeal fashion through test-driven
-development. A database engine and schema still need to be chosen for
-the act of storing folders and their photos. The frontend will consume the API; it will probably be Vue.js with Bulma CSS.
+[x] Postgres implementation
+[ ] Key-value store implementation
+[x] User registration
+[x] User metadata
+[ ] Folder upload
+[x] Folder metadata

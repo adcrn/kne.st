@@ -4,7 +4,6 @@ import (
 	"github.com/adcrn/webknest"
 	"github.com/adcrn/webknest/postgres"
 	"github.com/gin-gonic/gin"
-	//"golang.org/x/crypto/bcrypt"
 	"strconv"
 )
 
@@ -23,9 +22,12 @@ func NewHandler() *Handler {
 		Logger: gin.Logger(),
 	}
 
+	// Allow for versioning of API by making a group
 	h.Group("/api/v1")
 	{
 		h.POST("/register", h.register)
+
+		// Separation of user- and folder-specific handler functions
 		h.Group("/u")
 		{
 			h.GET("/:id/get", h.getUserInfo)
@@ -50,11 +52,13 @@ func NewHandler() *Handler {
 // details are taken and passed to the UserService interface.
 func (h *Handler) register(c *gin.Context) {
 
+	// Instantiate user object and convert JSON response into object
 	var u webknest.User
 	if err := c.BindJSON(&u); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 	}
 
+	// Create the user record in storage using the details from frontend
 	if _, err := h.UserService.Create(u); err == nil {
 
 		c.JSON(
@@ -78,6 +82,7 @@ func (h *Handler) register(c *gin.Context) {
 	}
 }
 
+// getUserInfo returns all non-confidential information about a user
 func (h *Handler) getUserInfo(c *gin.Context) {
 	var u webknest.User
 	userID, err := strconv.Atoi(c.Param("id")[1:])
@@ -95,6 +100,7 @@ func (h *Handler) getUserInfo(c *gin.Context) {
 	c.JSON(200, u)
 }
 
+// updateUserInfo allows for modification of non-senstive information of a user
 func (h *Handler) updateUserInfo(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Param("id"))
 	var u webknest.User
@@ -118,9 +124,29 @@ func (h *Handler) updateUserInfo(c *gin.Context) {
 
 }
 
+// changePassword allows for the singular action of changing a user's password
+// in the case that the current password is known; this is in contrast to a
+// password reset in which the psasword is not known
 func (h *Handler) changePassword(c *gin.Context) {
+	var pu webknest.PasswordUpdate
+	if err := c.BindJSON(&pu); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	userID, err := strconv.Atoi(c.Param("id")[1:])
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	err = h.UserService.ChangePassword(userID, pu)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(204, gin.H{"response": "success"})
 }
 
+// changePassword allows for the singular action of changing email
 func (h *Handler) changeEmail(c *gin.Context) {
 }
 
@@ -174,7 +200,6 @@ func (h *Handler) fetchUserFolders(c *gin.Context) {
 				"response": "malformed userID",
 			},
 		)
-		return
 	}
 
 	// Otherwise, return all folders associated
@@ -185,6 +210,7 @@ func (h *Handler) fetchUserFolders(c *gin.Context) {
 
 }
 
+// getFolderRecord will retrieve the corresponding record from storage
 func (h *Handler) getFolderRecord(c *gin.Context) {
 	var f webknest.Folder
 
@@ -203,10 +229,13 @@ func (h *Handler) getFolderRecord(c *gin.Context) {
 	c.JSON(200, f)
 }
 
+// createFolderRecord will add the record of a folder into storage
 func (h *Handler) createFolderRecord(c *gin.Context) {
 
 }
 
+// deleteFolderRecord will remove a folder record from storage; this should be
+// used after a person downloads their processed folders
 func (h *Handler) deleteFolderRecord(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("id")[1:])
 	foldername := c.Param("foldername")[1:]
@@ -224,6 +253,8 @@ func (h *Handler) deleteFolderRecord(c *gin.Context) {
 	c.JSON(204, gin.H{"response": "success"})
 }
 
+// updateFolderRecord will update details about the folder that weren't already
+// present at time of upload, e.g. completed/downloaded.
 func (h *Handler) updateFolderRecord(c *gin.Context) {
 	var f webknest.Folder
 	var fu webknest.FolderUpdate

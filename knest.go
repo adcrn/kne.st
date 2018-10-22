@@ -23,6 +23,12 @@ type DetailUpdate struct {
 	SubscriptionType int    `json:"sub_type"`
 }
 
+// PasswordUpdate allows for easy sole modification of passwords
+type PasswordUpdate struct {
+	CurrentPassword string `json:"current_password"`
+	NewPassword     string `json:"new_password"`
+}
+
 // UserService is the interface through which the handlers will interact with
 // the user data model
 type UserService interface {
