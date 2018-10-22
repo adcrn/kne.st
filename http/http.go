@@ -8,63 +8,37 @@ import (
 	"strconv"
 )
 
-// Handler holds the subhandlers, may change later.
+// Handler holds the interfaces to services
 type Handler struct {
-	UserHandler
-	FolderHandler
-}
-
-// UserHandler implements the UserService interface along with a router and
-// logger in order to work with requests from the frontend for user data
-type UserHandler struct {
 	*gin.Engine
-
-	UserService *postgres.UserService
-
-	Logger gin.HandlerFunc
-}
-
-// FolderHandler implements the FolderService interface along with a router and
-// logger in order to work with requests from the frontend for folder data
-type FolderHandler struct {
-	*gin.Engine
-
+	UserService   *postgres.UserService
 	FolderService *postgres.FolderService
-
-	Logger gin.HandlerFunc
+	Logger        gin.HandlerFunc
 }
 
-// NewUserHandler instantiates a UserHandler along with some routes
-func NewUserHandler() *UserHandler {
-	h := &UserHandler{
-		Engine: gin.Default(),
-		Logger: gin.Logger(),
-	}
-	h.POST("/api/v1/register", h.register)
-
-	h.Group("/api/v1/u")
-	{
-		h.GET("/:id/get", h.getUserInfo)
-		h.POST("/:id/update", h.updateUserInfo)
-	}
-
-	return h
-}
-
-// NewFolderHandler instantiates a FolderHandler along with some routes
-func NewFolderHandler() *FolderHandler {
-	h := &FolderHandler{
+// NewHandler returns a handler that allows for interfacing with services
+func NewHandler() *Handler {
+	h := &Handler{
 		Engine: gin.Default(),
 		Logger: gin.Logger(),
 	}
 
-	h.Group("/api/v1/f")
+	h.Group("/api/v1")
 	{
-		h.GET("/:id", h.fetchUserFolders)
-		h.GET("/:id/:foldername", h.getFolderRecord)
-		h.POST("/:id/:foldername/delete", h.deleteFolderRecord)
-		h.POST("/:id/:foldername/update", h.updateFolderRecord)
-		h.POST("/:id/upload", h.createFolderRecord)
+		h.POST("/register", h.register)
+		h.Group("/u")
+		{
+			h.GET("/:id/get", h.getUserInfo)
+			h.POST("/:id/update", h.updateUserInfo)
+		}
+		h.Group("/f")
+		{
+			h.GET("/:id", h.fetchUserFolders)
+			h.GET("/:id/:foldername", h.getFolderRecord)
+			h.POST("/:id/:foldername/delete", h.deleteFolderRecord)
+			h.POST("/:id/:foldername/update", h.updateFolderRecord)
+			h.POST("/:id/upload", h.createFolderRecord)
+		}
 	}
 
 	return h
@@ -72,7 +46,7 @@ func NewFolderHandler() *FolderHandler {
 
 // register is the function through which a user's desired credentials and
 // details are taken and passed to the UserService interface.
-func (h *UserHandler) register(c *gin.Context) {
+func (h *Handler) register(c *gin.Context) {
 
 	var u webknest.User
 	if err := c.BindJSON(&u); err != nil {
@@ -102,7 +76,7 @@ func (h *UserHandler) register(c *gin.Context) {
 	}
 }
 
-func (h *UserHandler) getUserInfo(c *gin.Context) {
+func (h *Handler) getUserInfo(c *gin.Context) {
 	var u webknest.User
 	userID, err := strconv.Atoi(c.Param("id")[1:])
 
@@ -119,33 +93,24 @@ func (h *UserHandler) getUserInfo(c *gin.Context) {
 	c.JSON(200, u)
 }
 
-func (h *UserHandler) updateUserInfo(c *gin.Context) {
+func (h *Handler) updateUserInfo(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Param("id"))
-	pass := c.Param("password")
-	firstName := c.Param("first_name")
-	lastName := c.Param("last_name")
-	email := c.Param("email")
-	subType, _ := strconv.Atoi(c.Param("sub_type"))
-
 	var u webknest.User
+	var cu webknest.CredentialUpdate
 
 	u, err := h.UserService.GetByID(userID)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 	}
 
-	// Should probably break out password changes into their own function, will
-	// do soon
-	if pass == "" {
-		pass = u.Password
+	if err = c.BindJSON(&cu); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
 	}
 
-	cu := webknest.CredentialUpdate{
-		Password:         pass,
-		FirstName:        firstName,
-		LastName:         lastName,
-		Email:            email,
-		SubscriptionType: subType,
+	// Should probably break out password changes into their own function, will
+	// do soon
+	if cu.Password == "" {
+		cu.Password = u.Password
 	}
 
 	err = h.UserService.Update(u, cu)
@@ -191,7 +156,7 @@ func statusHandler(c *gin.Context) {
 
 // fetchUserFolders takes in the id parameter passed from the frontend
 // and returns all folders of that particular user from the database
-func (h *FolderHandler) fetchUserFolders(c *gin.Context) {
+func (h *Handler) fetchUserFolders(c *gin.Context) {
 	// Retrieve user ID from GET request and
 	// convert it to an integer
 	userID, err := strconv.Atoi(c.Param("id")[1:])
@@ -218,7 +183,7 @@ func (h *FolderHandler) fetchUserFolders(c *gin.Context) {
 
 }
 
-func (h *FolderHandler) getFolderRecord(c *gin.Context) {
+func (h *Handler) getFolderRecord(c *gin.Context) {
 	var f webknest.Folder
 
 	userID, err := strconv.Atoi(c.Param("id")[1:])
@@ -236,47 +201,45 @@ func (h *FolderHandler) getFolderRecord(c *gin.Context) {
 	c.JSON(200, f)
 }
 
-func (h *FolderHandler) createFolderRecord(c *gin.Context) {
+func (h *Handler) createFolderRecord(c *gin.Context) {
 
 }
 
-func (h *FolderHandler) deleteFolderRecord(c *gin.Context) {
+func (h *Handler) deleteFolderRecord(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("id")[1:])
 	foldername := c.Param("foldername")[1:]
 
 	if err != nil {
-		c.JSON(
-
-			400,
-
-			gin.H{
-				"response": "malformed userID",
-			},
-		)
-		return
+		c.JSON(400, gin.H{"response": "malformed userID"})
 	}
 
 	err = h.FolderService.Delete(userID, foldername)
 
 	if err != nil {
-		c.JSON(
-
-			400,
-
-			gin.H{
-				"response": err.Error(),
-			},
-		)
-		return
+		c.JSON(400, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(
-		204,
-		gin.H{
-			"response": "success",
-		},
-	)
+	c.JSON(204, gin.H{"response": "success"})
 }
 
-func (h *FolderHandler) updateFolderRecord(c *gin.Context) {
+func (h *Handler) updateFolderRecord(c *gin.Context) {
+	var f webknest.Folder
+	var fu webknest.FolderUpdate
+	userID, err := strconv.Atoi(c.Param("id")[1:])
+	foldername := c.Param("folder_name")
+
+	f, err = h.FolderService.GetByName(userID, foldername)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	if err := c.BindJSON(&fu); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	if err = h.FolderService.Update(f, fu); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(204, gin.H{"response": "success"})
 }

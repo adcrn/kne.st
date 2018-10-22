@@ -11,10 +11,10 @@ import (
 	"os"
 
 	"github.com/gin-contrib/static"
-	"github.com/gin-gonic/gin"
+	//"github.com/gin-gonic/gin"
 )
 
-var r *gin.Engine
+//var r *gin.Engine
 
 func main() {
 	db, err := postgres.Open(os.Getenv("DB"))
@@ -27,21 +27,17 @@ func main() {
 	fs := &postgres.FolderService{DB: db}
 
 	var h http.Handler
-	var uh http.UserHandler
-	var fh http.FolderHandler
-	uh.UserService = us
-	fh.FolderService = fs
-	h.UserHandler = uh
-	h.FolderHandler = fh
+	h.UserService = us
+	h.FolderService = fs
 
 	// Gin's default router uses radix trees, helpful for our use case.
-	r = gin.Default()
+	//r = gin.Default()
 
 	// Serve assets through static middleware.
-	r.Use(static.Serve("/assets", static.LocalFile("./assets", true)))
+	h.Engine.Use(static.Serve("/assets", static.LocalFile("./assets", true)))
 
 	// Process the templates.
-	r.LoadHTMLGlob("templates/*")
+	h.Engine.LoadHTMLGlob("templates/*")
 
-	r.Run()
+	h.Engine.Run()
 }
