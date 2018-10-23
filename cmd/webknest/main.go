@@ -4,20 +4,26 @@
 package main
 
 import (
-	//"github.com/adcrn/webknest"
+	"database/sql"
+	"fmt"
 	"github.com/adcrn/webknest/http"
 	"github.com/adcrn/webknest/postgres"
 	"log"
-	"os"
 
 	"github.com/gin-contrib/static"
-	//"github.com/gin-gonic/gin"
 )
 
-//var r *gin.Engine
+const (
+	dbUser     = "postgres"
+	dbPassword = "postgres"
+	dbName     = "test"
+)
 
 func main() {
-	db, err := postgres.Open(os.Getenv("DB"))
+	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
+		dbUser, dbPassword, dbName)
+
+	db, err := sql.Open("postgres", dbinfo)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,9 +35,6 @@ func main() {
 	var h http.Handler
 	h.UserService = us
 	h.FolderService = fs
-
-	// Gin's default router uses radix trees, helpful for our use case.
-	//r = gin.Default()
 
 	// Serve assets through static middleware.
 	h.Engine.Use(static.Serve("/assets", static.LocalFile("./assets", true)))
