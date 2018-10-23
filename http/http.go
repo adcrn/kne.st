@@ -249,7 +249,8 @@ func (h *Handler) getFolderRecord(c *gin.Context) {
 	c.JSON(200, f)
 }
 
-// createFolderRecord will add the record of a folder into storage
+// createFolderRecord will add the record of a folder into storage by calling
+// the upload function (defined elsewhere) and storing its returned folder path
 func (h *Handler) createFolderRecord(c *gin.Context) {
 
 }
