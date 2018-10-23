@@ -1,6 +1,7 @@
 package http
 
 import (
+	"encoding/json"
 	"github.com/adcrn/webknest"
 	"github.com/adcrn/webknest/postgres"
 	"github.com/gin-gonic/gin"
@@ -100,7 +101,7 @@ func (h *Handler) getUserInfo(c *gin.Context) {
 	c.JSON(200, u)
 }
 
-// updateUserInfo allows for modification of non-senstive information of a user
+// updateUserInfo allows for modification of non-sensitive information of a user
 func (h *Handler) updateUserInfo(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Param("id"))
 	var u webknest.User
@@ -146,8 +147,27 @@ func (h *Handler) changePassword(c *gin.Context) {
 	c.JSON(204, gin.H{"response": "success"})
 }
 
-// changePassword allows for the singular action of changing email
+// changeEmail allows for the singular action of changing email
 func (h *Handler) changeEmail(c *gin.Context) {
+	var email string
+	userID, _ := strconv.Atoi(c.Param("id")[1:])
+
+	// No need to make a struct for one field
+	var response map[string]string
+	body, _ := c.GetRawData()
+	err := json.Unmarshal(body, &response)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	email = response["email"]
+	err = h.UserService.ChangeEmail(userID, email)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(204, gin.H{"response": "success"})
+
 }
 
 // showIndexPage will return the home page of the website when the user
@@ -177,7 +197,7 @@ func statusHandler(c *gin.Context) {
 		200,
 
 		gin.H{
-			"status": "Good.",
+			"status": "good",
 		},
 	)
 }

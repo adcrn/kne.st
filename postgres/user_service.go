@@ -169,16 +169,19 @@ func (us *UserService) ChangePassword(userID int, pu webknest.PasswordUpdate) er
 	}
 	defer stmt.Close()
 
+	// Retrieve hash of current password from the database
 	err = stmt.QueryRow(userID).Scan(&passFromDB)
 	if err != nil {
 		return err
 	}
 
+	// Compare the hash to the confirmation password supplied by user
 	err = bcrypt.CompareHashAndPassword([]byte(passFromDB), []byte(pu.CurrentPassword))
 	if err != nil {
 		return err
 	}
 
+	// Generate hash for new user-supplied password
 	newHash, err := bcrypt.GenerateFromPassword([]byte(pu.NewPassword), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -196,6 +199,7 @@ func (us *UserService) ChangePassword(userID int, pu webknest.PasswordUpdate) er
 	}
 	defer stmt2.Close()
 
+	// Update user password with new hash
 	_, err = stmt2.Exec(string(newHash), userID)
 	if err != nil {
 		return err
@@ -211,6 +215,27 @@ func (us *UserService) ChangePassword(userID int, pu webknest.PasswordUpdate) er
 
 // ChangeEmail allows for the easy emodication of email records
 func (us *UserService) ChangeEmail(userID int, newEmail string) error {
+	tx, err := us.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare(`update users set email = $1 where id = $2`)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(newEmail, userID)
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
