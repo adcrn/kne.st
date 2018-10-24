@@ -21,9 +21,11 @@ Start the server by running `./knest` and then direct a browser to
   photos
 
 ## Current Progress
-- [x] Postgres implementation
-- [ ] Key-value store implementation
-- [x] User registration
-- [x] User metadata
-- [ ] Folder upload
 - [x] Folder metadata
+- [x] Folder upload to local storage
+- [ ] Key-value store implementation
+- [x] Postgres implementation
+- [ ] Session management
+- [ ] User authentication
+- [x] User metadata
+- [x] User registration

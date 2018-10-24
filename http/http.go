@@ -252,7 +252,32 @@ func (h *Handler) getFolderRecord(c *gin.Context) {
 // createFolderRecord will add the record of a folder into storage by calling
 // the upload function (defined elsewhere) and storing its returned folder path
 func (h *Handler) createFolderRecord(c *gin.Context) {
+	// Retrieving the user object for now until sessions are implemented
+	var u webknest.User
+	var f webknest.Folder
 
+	userID, err := strconv.Atoi(c.Param("id")[1:])
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	u, err = h.UserService.GetByID(userID)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	// Pass the username to the upload function
+	f, err = UploadHandler(c, u)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	_, err = h.FolderService.Create(f)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(200, gin.H{"response": "success"})
 }
 
 // deleteFolderRecord will remove a folder record from storage; this should be
