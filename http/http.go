@@ -18,6 +18,7 @@ type Handler struct {
 
 // NewHandler returns a handler that allows for interfacing with services
 func NewHandler() *Handler {
+
 	h := &Handler{
 		Engine: gin.Default(),
 		Logger: gin.Logger(),
@@ -34,7 +35,7 @@ func NewHandler() *Handler {
 			h.GET("/:id/get", h.getUserInfo)
 			h.POST("/:id/update", h.updateUserInfo)
 			h.POST("/:id/changepass", h.changePassword)
-			h.POST("/:id/changeemai", h.changeEmail)
+			h.POST("/:id/changeemail", h.changeEmail)
 		}
 		h.Group("/f")
 		{
