@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"github.com/adcrn/webknest"
+	"github.com/adcrn/webknest/errors"
 	"github.com/adcrn/webknest/postgres"
 	"github.com/gin-gonic/gin"
 	"strconv"
@@ -13,7 +14,7 @@ type Handler struct {
 	*gin.Engine
 	UserService   *postgres.UserService
 	FolderService *postgres.FolderService
-	Logger        gin.HandlerFunc
+	//Logger        gin.HandlerFunc
 }
 
 // NewHandler returns a handler that allows for interfacing with services
@@ -21,33 +22,43 @@ func NewHandler() *Handler {
 
 	h := &Handler{
 		Engine: gin.Default(),
-		Logger: gin.Logger(),
+		//Logger: gin.Logger(),
 	}
 
 	// Allow for versioning of API by making a group
-	h.Group("/api/v1")
+	v1 := h.Group("/api/v1")
 	{
-		h.POST("/register", h.register)
+		v1.POST("/register", h.register)
 
 		// Separation of user- and folder-specific handler functions
-		h.Group("/u")
+		userRoutes := v1.Group("/u")
 		{
-			h.GET("/:id/get", h.getUserInfo)
-			h.POST("/:id/update", h.updateUserInfo)
-			h.POST("/:id/changepass", h.changePassword)
-			h.POST("/:id/changeemail", h.changeEmail)
+			userRoutes.GET("/get/:id", h.getUserInfo)
+			userRoutes.POST("/update/:id", h.updateUserInfo)
+			userRoutes.POST("/changepass/:id", h.changePassword)
+			userRoutes.POST("/changeemail/:id", h.changeEmail)
 		}
-		h.Group("/f")
+		folderRoutes := v1.Group("/f")
 		{
-			h.GET("/:id", h.fetchUserFolders)
-			h.GET("/:id/:foldername", h.getFolderRecord)
-			h.POST("/:id/:foldername/delete", h.deleteFolderRecord)
-			h.POST("/:id/:foldername/update", h.updateFolderRecord)
-			h.POST("/:id/upload", h.createFolderRecord)
+			folderRoutes.GET("/fetch/:id", h.fetchUserFolders)
+			folderRoutes.GET("/get/:id/:foldername", h.getFolderRecord)
+			folderRoutes.POST("/delete/:id/:foldername", h.deleteFolderRecord)
+			folderRoutes.POST("/update/:id/:foldername", h.updateFolderRecord)
+			folderRoutes.POST("/upload/:id", h.createFolderRecord)
 		}
 	}
 
 	return h
+}
+
+// UseMiddleware is just to access the internal gin Use function
+func (h *Handler) UseMiddleware(middleware gin.HandlerFunc) {
+	h.Use(middleware)
+}
+
+// RunServer is just to access the internal gin Run function
+func (h *Handler) RunServer() {
+	h.Run()
 }
 
 // register is the function through which a user's desired credentials and
@@ -57,46 +68,32 @@ func (h *Handler) register(c *gin.Context) {
 	// Instantiate user object and convert JSON response into object
 	var u webknest.User
 	if err := c.BindJSON(&u); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
 	}
 
 	// Create the user record in storage using the details from frontend
-	if _, err := h.UserService.Create(u); err == nil {
-
-		c.JSON(
-
-			200,
-
-			gin.H{
-				"response": "registration successful",
-			},
-		)
-	} else {
-
-		c.JSON(
-
-			400,
-
-			gin.H{
-				"error": err.Error(),
-			},
-		)
+	if _, err := h.UserService.Create(u); err != nil {
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
+
+	c.JSON(204, gin.H{"response": "success"})
 }
 
 // getUserInfo returns all non-confidential information about a user
 func (h *Handler) getUserInfo(c *gin.Context) {
 	var u webknest.User
-	userID, err := strconv.Atoi(c.Param("id")[1:])
-
+	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Bad user ID"})
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
 	}
 
 	u, err = h.UserService.GetByID(userID)
-
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
 
 	c.JSON(200, u)
@@ -104,22 +101,30 @@ func (h *Handler) getUserInfo(c *gin.Context) {
 
 // updateUserInfo allows for modification of non-sensitive information of a user
 func (h *Handler) updateUserInfo(c *gin.Context) {
-	userID, _ := strconv.Atoi(c.Param("id"))
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
+	}
+
 	var u webknest.User
 	var du webknest.DetailUpdate
 
-	u, err := h.UserService.GetByID(userID)
+	u, err = h.UserService.GetByID(userID)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
 
 	if err = c.BindJSON(&du); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
 	}
 
 	err = h.UserService.UpdateDetails(u, du)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
 
 	c.JSON(204, gin.H{"response": "Update successful"})
@@ -132,17 +137,20 @@ func (h *Handler) updateUserInfo(c *gin.Context) {
 func (h *Handler) changePassword(c *gin.Context) {
 	var pu webknest.PasswordUpdate
 	if err := c.BindJSON(&pu); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
 	}
 
-	userID, err := strconv.Atoi(c.Param("id")[1:])
+	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
 	}
 
 	err = h.UserService.ChangePassword(userID, pu)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
 
 	c.JSON(204, gin.H{"response": "success"})
@@ -151,20 +159,26 @@ func (h *Handler) changePassword(c *gin.Context) {
 // changeEmail allows for the singular action of changing email
 func (h *Handler) changeEmail(c *gin.Context) {
 	var email string
-	userID, _ := strconv.Atoi(c.Param("id")[1:])
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
+	}
 
 	// No need to make a struct for one field
 	var response map[string]string
 	body, _ := c.GetRawData()
-	err := json.Unmarshal(body, &response)
+	err = json.Unmarshal(body, &response)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
 	}
 
 	email = response["email"]
 	err = h.UserService.ChangeEmail(userID, email)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
 
 	c.JSON(204, gin.H{"response": "success"})
@@ -206,45 +220,40 @@ func statusHandler(c *gin.Context) {
 // fetchUserFolders takes in the id parameter passed from the frontend
 // and returns all folders of that particular user from the database
 func (h *Handler) fetchUserFolders(c *gin.Context) {
+	var folders []webknest.Folder
 	// Retrieve user ID from GET request and
 	// convert it to an integer
-	userID, err := strconv.Atoi(c.Param("id")[1:])
-
-	// If ID is not a parsable number,
-	// return an error string
+	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(
-
-			400,
-
-			gin.H{
-				"response": "malformed userID",
-			},
-		)
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
 	}
 
 	// Otherwise, return all folders associated
 	// with that user ID
-	if folders, err := h.FolderService.ListByUser(userID); err == nil {
-		c.JSON(200, folders)
+	if folders, err = h.FolderService.ListByUser(userID); err != nil {
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
 	}
 
+	c.JSON(200, folders)
 }
 
 // getFolderRecord will retrieve the corresponding record from storage
 func (h *Handler) getFolderRecord(c *gin.Context) {
 	var f webknest.Folder
 
-	userID, err := strconv.Atoi(c.Param("id")[1:])
+	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
 	}
 
-	folderName := c.Param("foldername")[1:]
+	folderName := c.Param("foldername")
 
 	f, err = h.FolderService.GetByName(userID, folderName)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
 
 	c.JSON(200, f)
@@ -257,25 +266,29 @@ func (h *Handler) createFolderRecord(c *gin.Context) {
 	var u webknest.User
 	var f webknest.Folder
 
-	userID, err := strconv.Atoi(c.Param("id")[1:])
+	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
 	}
 
 	u, err = h.UserService.GetByID(userID)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
 
 	// Pass the username to the upload function
 	f, err = UploadHandler(c, u)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrUploadFailed})
+		return
 	}
 
 	_, err = h.FolderService.Create(f)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
 
 	c.JSON(200, gin.H{"response": "success"})
@@ -284,17 +297,19 @@ func (h *Handler) createFolderRecord(c *gin.Context) {
 // deleteFolderRecord will remove a folder record from storage; this should be
 // used after a person downloads their processed folders
 func (h *Handler) deleteFolderRecord(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("id")[1:])
-	foldername := c.Param("foldername")[1:]
+	userID, err := strconv.Atoi(c.Param("id"))
+	foldername := c.Param("foldername")
 
 	if err != nil {
-		c.JSON(400, gin.H{"response": "malformed userID"})
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
 	}
 
 	err = h.FolderService.Delete(userID, foldername)
 
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
 
 	c.JSON(204, gin.H{"response": "success"})
@@ -305,20 +320,29 @@ func (h *Handler) deleteFolderRecord(c *gin.Context) {
 func (h *Handler) updateFolderRecord(c *gin.Context) {
 	var f webknest.Folder
 	var fu webknest.FolderUpdate
-	userID, err := strconv.Atoi(c.Param("id")[1:])
+
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
+	}
+
 	foldername := c.Param("folder_name")
 
 	f, err = h.FolderService.GetByName(userID, foldername)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
 
 	if err := c.BindJSON(&fu); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrBadRequest})
+		return
 	}
 
 	if err = h.FolderService.Update(f, fu); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		return
 	}
 
 	c.JSON(204, gin.H{"response": "success"})

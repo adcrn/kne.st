@@ -11,7 +11,7 @@ import (
 	"log"
 
 	"github.com/gin-contrib/static"
-	"github.com/gin-gonic/gin"
+	//"github.com/gin-gonic/gin"
 )
 
 const (
@@ -32,18 +32,17 @@ func main() {
 
 	us := &postgres.UserService{DB: db}
 	fs := &postgres.FolderService{DB: db}
-	r := gin.Default()
+	//r := gin.Default()
 
-	var h http.Handler
-	h.Engine = r
+	h := http.NewHandler()
 	h.UserService = us
 	h.FolderService = fs
 
 	// Serve assets through static middleware.
-	h.Use(static.Serve("/assets", static.LocalFile("./assets", true)))
+	h.UseMiddleware(static.Serve("/assets", static.LocalFile("./assets", true)))
 
 	// Process the templates.
 	//h.LoadHTMLGlob("/templates/*")
 
-	h.Run()
+	h.RunServer()
 }
