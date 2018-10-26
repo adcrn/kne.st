@@ -17,7 +17,7 @@ type FolderService struct {
 func (fs *FolderService) ListByUser(ownerID int) ([]webknest.Folder, error) {
 	var folders []webknest.Folder
 
-	stmt, err := fs.DB.Prepare(`select * from folders where owner_id = $N`)
+	stmt, err := fs.DB.Prepare(`select * from folders where owner_id = $1`)
 	if err != nil {
 		return []webknest.Folder{}, err
 	}
@@ -80,14 +80,14 @@ func (fs *FolderService) Create(f webknest.Folder) (int, error) {
 	}
 	defer tx.Rollback()
 
-	stmt, err := tx.Prepare(`insert into folders(folder_name, upload_time, 
-					num_elements, completed, downloaded) values($1, $2, $3, $4, $5 RETURNING id`)
+	stmt, err := tx.Prepare(`insert into folders (folder_name, path, upload_time, 
+					num_elements, completed, downloaded) values($1, $2, $3, $4, $5, $6 RETURNING id`)
 	if err != nil {
 		return -1, err
 	}
 	defer stmt.Close()
 
-	err = stmt.QueryRow(f.FolderName, time.Now().Format(sqlTimeFormat),
+	err = stmt.QueryRow(f.FolderName, f.S3Path, time.Now().Format(sqlTimeFormat),
 		f.NumElements, f.Completed, f.Downloaded).Scan(&folderID)
 	if err != nil {
 		return -1, err

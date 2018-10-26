@@ -11,13 +11,12 @@ import (
 	"log"
 
 	"github.com/gin-contrib/static"
-	//"github.com/gin-gonic/gin"
 )
 
 const (
 	dbUser     = "postgres"
-	dbPassword = "postgres"
-	dbName     = "test"
+	dbPassword = "test"
+	dbName     = "knest_test"
 )
 
 func main() {
@@ -32,7 +31,6 @@ func main() {
 
 	us := &postgres.UserService{DB: db}
 	fs := &postgres.FolderService{DB: db}
-	//r := gin.Default()
 
 	h := http.NewHandler()
 	h.UserService = us

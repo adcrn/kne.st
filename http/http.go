@@ -74,7 +74,7 @@ func (h *Handler) register(c *gin.Context) {
 
 	// Create the user record in storage using the details from frontend
 	if _, err := h.UserService.Create(u); err != nil {
-		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -92,7 +92,7 @@ func (h *Handler) getUserInfo(c *gin.Context) {
 
 	u, err = h.UserService.GetByID(userID)
 	if err != nil {
-		c.JSON(400, gin.H{"error": errors.ErrDatabaseError})
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 

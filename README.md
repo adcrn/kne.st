@@ -4,11 +4,10 @@
 Backend for a possible SaaS offering of [knest](https://github.com/adcrn/knest).
 
 ## Building
-`go build -o knest`
+Navigate to the `cmd/webknest` directory and run `go build -o knest`.
 
 ## Usage
-Start the server by running `./knest` and then direct a browser to
-`localhost:8080`
+Start the server and then direct a browser to `localhost:8080`.
 
 ## Current Progress
 - [x] Folder metadata

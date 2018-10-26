@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"github.com/adcrn/webknest"
+	"github.com/adcrn/webknest/errors"
 
 	_ "github.com/lib/pq" // Driver for database/sql
 	"golang.org/x/crypto/bcrypt"
@@ -17,7 +18,7 @@ type UserService struct {
 func (us *UserService) ListBySubscriptionType(subType int) ([]*webknest.User, error) {
 	var users []*webknest.User
 
-	stmt, err := us.DB.Prepare(`select id, username, email, sub_type from users where sub_type = $N`)
+	stmt, err := us.DB.Prepare(`select id, username, email, sub_type from users where sub_type = $1`)
 	if err != nil {
 		return []*webknest.User{}, err
 	}
@@ -59,7 +60,7 @@ func (us *UserService) ListBySubscriptionType(subType int) ([]*webknest.User, er
 func (us *UserService) GetByID(userID int) (webknest.User, error) {
 	var u webknest.User
 
-	stmt, err := us.DB.Prepare(`select * from users where id = $N`)
+	stmt, err := us.DB.Prepare(`select * from users where id = $1`)
 	if err != nil {
 		return webknest.User{}, err
 	}
@@ -77,7 +78,7 @@ func (us *UserService) GetByID(userID int) (webknest.User, error) {
 func (us *UserService) GetByUsername(username string) (webknest.User, error) {
 	var u webknest.User
 
-	stmt, err := us.DB.Prepare(`select * from users where username = $N`)
+	stmt, err := us.DB.Prepare(`select * from users where username = $1`)
 	if err != nil {
 		return webknest.User{}, err
 	}
@@ -86,7 +87,7 @@ func (us *UserService) GetByUsername(username string) (webknest.User, error) {
 	err = stmt.QueryRow(username).Scan(&u.ID, &u.Username, &u.Password, &u.FirstName, &u.LastName,
 		&u.Email, &u.SubscriptionType)
 	if err != nil {
-		return webknest.User{}, err
+		return webknest.User{}, errors.ErrUsernameNotFound
 	}
 
 	return u, nil
@@ -109,7 +110,7 @@ func (us *UserService) Create(u webknest.User) (int, error) {
 	}
 	defer tx.Rollback()
 
-	stmt, err := tx.Prepare(`insert into users(username, password, first_name, last_name, email, sub_type)
+	stmt, err := tx.Prepare(`insert into users (username, password, first_name, last_name, email, sub_type)
 					values($1, $2, $3, $4, $5, $6) RETURNING id`)
 	if err != nil {
 		return -1, err
@@ -163,7 +164,7 @@ func (us *UserService) UpdateDetails(u webknest.User, du webknest.DetailUpdate) 
 // password and if it passes, then the password is changed to the new one
 func (us *UserService) ChangePassword(userID int, pu webknest.PasswordUpdate) error {
 	var passFromDB string
-	stmt, err := us.DB.Prepare(`select password from users where id = $N`)
+	stmt, err := us.DB.Prepare(`select password from users where id = $1`)
 	if err != nil {
 		return err
 	}
@@ -178,7 +179,7 @@ func (us *UserService) ChangePassword(userID int, pu webknest.PasswordUpdate) er
 	// Compare the hash to the confirmation password supplied by user
 	err = bcrypt.CompareHashAndPassword([]byte(passFromDB), []byte(pu.CurrentPassword))
 	if err != nil {
-		return err
+		return errors.ErrPassDoesNotMatch
 	}
 
 	// Generate hash for new user-supplied password
@@ -249,7 +250,7 @@ func (us *UserService) Delete(userID int) error {
 	}
 	defer tx.Rollback()
 
-	stmt, err := tx.Prepare(`delete from users where id = $N`)
+	stmt, err := tx.Prepare(`delete from users where id = $1`)
 	if err != nil {
 		return err
 	}
