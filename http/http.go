@@ -5,7 +5,10 @@ import (
 	"github.com/adcrn/webknest"
 	"github.com/adcrn/webknest/errors"
 	"github.com/adcrn/webknest/postgres"
+	"github.com/auth0-community/go-auth0"
 	"github.com/gin-gonic/gin"
+	jose "gopkg.in/square/go-jose.v2"
+	"os"
 	"strconv"
 )
 
@@ -14,7 +17,6 @@ type Handler struct {
 	*gin.Engine
 	UserService   *postgres.UserService
 	FolderService *postgres.FolderService
-	//Logger        gin.HandlerFunc
 }
 
 // NewHandler returns a handler that allows for interfacing with services
@@ -22,7 +24,6 @@ func NewHandler() *Handler {
 
 	h := &Handler{
 		Engine: gin.Default(),
-		//Logger: gin.Logger(),
 	}
 
 	// Allow for versioning of API by making a group
@@ -32,6 +33,7 @@ func NewHandler() *Handler {
 
 		// Separation of user- and folder-specific handler functions
 		userRoutes := v1.Group("/u")
+		userRoutes.Use(authRequired())
 		{
 			userRoutes.GET("/get/:id", h.getUserInfo)
 			userRoutes.POST("/update/:id", h.updateUserInfo)
@@ -39,6 +41,7 @@ func NewHandler() *Handler {
 			userRoutes.POST("/changeemail/:id", h.changeEmail)
 		}
 		folderRoutes := v1.Group("/f")
+		folderRoutes.Use(authRequired())
 		{
 			folderRoutes.GET("/fetch/:id", h.fetchUserFolders)
 			folderRoutes.GET("/get/:id/:foldername", h.getFolderRecord)
@@ -346,4 +349,24 @@ func (h *Handler) updateFolderRecord(c *gin.Context) {
 	}
 
 	c.JSON(204, gin.H{"response": "success"})
+}
+
+// This function was taken from Auth0's website in order to simplify user auth
+func authRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		var auth0Domain = "https://" + os.Getenv("AUTH0_DOMAIN") + "/"
+		client := auth0.NewJWKClient(auth0.JWKClientOptions{URI: auth0Domain + ".well-known/jwks.json"}, nil)
+		configuration := auth0.NewConfiguration(client, []string{os.Getenv("AUTH0_API_IDENTIFIER")}, auth0Domain, jose.RS256)
+		validator := auth0.NewValidator(configuration, nil)
+
+		_, err := validator.ValidateRequest(c.Request)
+
+		if err != nil {
+			c.JSON(401, gin.H{"error": "token is not valid"})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
 }
