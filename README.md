@@ -18,11 +18,13 @@ Navigate to the `cmd/webknest` directory and run `go build -o knest`.
 Start the server and then direct a browser to `localhost:8080`.
 
 ## Current Progress
+- [ ] CORS middleware for frontend interaction
 - [x] Folder metadata
 - [x] Folder upload to local storage
 - [ ] Key-value store implementation
 - [x] Postgres implementation
 - [x] Session management - using [Auth0](https://auth0.com)
+- [ ] System call to knest desktop application
 - [x] User authentication - using [Auth0](https://auth0.com)
 - [x] User metadata
 - [x] User registration
