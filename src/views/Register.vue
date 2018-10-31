@@ -1,0 +1,74 @@
+<template>
+  <div class="register">
+    <h1 class="is-size-2 has-text-centered"><strong>Create Account</strong></h1>
+    <span>{{ error }}</span>
+    <div class="field is-grouped is-grouped-centered">
+      <div class="control">
+        <label class="label">First Name</label>
+        <input class="input" type="text">
+      </div>
+      <div class="control">
+        <label class="label">Last Name</label>
+        <input class="input" type="text">
+      </div>
+    </div>
+    <div class="field is-grouped is-grouped-centered">
+      <div class="control">
+        <label class="label">Username</label>
+        <input class="input" type="text">
+      </div>
+      <div class="control">
+        <label class="label">Password</label>
+        <input class="input" type="password">
+      </div>
+    </div>
+    <div class="field is-grouped is-grouped-centered">
+      <div class="control">
+        <label class="label">Email</label>
+        <input class="input" type="email">
+      </div>
+      <div class="control">
+        <label class="label">Confirm Email</label>
+        <input class="input" type="email">
+      </div>
+    </div>
+    <div class="field is-grouped is-grouped-centered">
+      <div class="control">
+        <label class="checkbox">
+          <input type="checkbox" id="checkbox" v-model="checked">
+          I agree to the <a href="#">terms and conditions</a>
+        </label>
+      </div>
+    </div>
+    <div class="field is-grouped is-grouped-centered">
+      <div class="control">
+        <button class="button is-primary is-medium">Submit</button>
+      </div>
+      <div class="control">
+        <button class="button is-danger is-medium">Cancel</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "register",
+  components: {},
+  data() {
+    return {
+      error: ""
+    };
+  }
+};
+</script>
+
+<style scoped lang="scss">
+.register {
+  padding-top: 10rem;
+}
+
+h1 {
+  padding-bottom: 1rem;
+}
+</style>
