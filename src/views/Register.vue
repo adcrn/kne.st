@@ -4,16 +4,6 @@
     <span>{{ error }}</span>
     <div class="field is-grouped is-grouped-centered">
       <div class="control">
-        <label class="label">First Name</label>
-        <input class="input" type="text">
-      </div>
-      <div class="control">
-        <label class="label">Last Name</label>
-        <input class="input" type="text">
-      </div>
-    </div>
-    <div class="field is-grouped is-grouped-centered">
-      <div class="control">
         <label class="label">Username</label>
         <input class="input" type="text">
       </div>
@@ -42,10 +32,10 @@
     </div>
     <div class="field is-grouped is-grouped-centered">
       <div class="control">
-        <button class="button is-primary is-medium">Submit</button>
+        <button class="button is-primary is-medium">Continue</button>
       </div>
       <div class="control">
-        <button class="button is-danger is-medium">Cancel</button>
+        <button class="button is-danger is-medium is-outlined">Cancel</button>
       </div>
     </div>
   </div>
@@ -65,7 +55,7 @@ export default {
 
 <style scoped lang="scss">
 .register {
-  padding-top: 10rem;
+  padding: 12rem;
 }
 
 h1 {
