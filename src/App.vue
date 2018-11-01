@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="navbar has-shadow" role="navigation" aria-label="main navigation">
+    <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <router-link to="/">
           <img src="./assets/logo.png" alt="knest logo" width="64" height="28">
@@ -22,10 +22,17 @@
           </div>
         </div>
       </div>
-    </div>
+    </nav>
     <router-view/>
   </div>
 </template>
 
 <style lang="scss">
+#app {
+  background-color: #f8f8f8;
+}
+.navbar {
+  padding-left: 0.5rem;
+  background-color: #f8f8f8;
+}
 </style>

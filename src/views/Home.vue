@@ -1,42 +1,46 @@
 <template>
   <div class="home">
-    <section class="intro has-text-centered">
-      <div class="container">
-        <p class="is-size-4"><strong>An end-to-end solution that selects and enhances bird photographs</strong></p>
-        <p class="is-size-5">
-          <i>knest</i> leverages state-of-the-art techniques in machine learning and<br>
-          computer vision in order to find and crop birds in your photographs.<br>
-          <strong>You upload the photos, we give you the bird(s).</strong>
-        </p>
-        <div class="field is-grouped">
-          <p class="control">
-            <a class="button is-primary is-medium">sign up</a>
+    <section class="hero is-light is-fullheight-with-navbar has-text-centered">
+      <div class="hero-body">
+        <div class="container">
+          <div class="intro">
+          <p class="is-size-4"><strong>An end-to-end solution that selects and enhances bird photographs</strong></p>
+          <p class="is-size-5">
+            <i>knest</i> leverages state-of-the-art techniques in machine learning and<br>
+            computer vision in order to find and crop birds in your photographs.<br>
+            <strong>You upload the photos, we give you the bird(s).</strong>
           </p>
-          <p class="control">
-            <a class="button is-medium">learn more</a>
-          </p>
+          </div>
+          <div class="field is-grouped">
+            <p class="control">
+              <router-link to="/register">
+                <a class="button is-primary is-medium">sign up</a>
+              </router-link>
+            </p>
+            <p class="control">
+              <a class="button is-medium">learn more</a>
+            </p>
+          </div>
         </div>
+        <nav class="level">
+          <div class="level-item has-text-centered">
+            <div>
+              <figure class="image is-320x240">
+                <img src="../assets/home/1.jpg" alt="tiny bird in tree" width="360" height="240">
+              </figure>
+              <p class="is-size-6">Original Photo</p>
+            </div>
+          </div>
+          <div class="level-item has-text-centered">
+            <div>
+              <figure class="image is-320x240">
+                <img src="../assets/home/1_p.jpg" alt="zoomed image of tiny bird in tree" width="360" height="240">
+              </figure>
+              <p class="is-size-6">Processed Photo</p>
+            </div>
+          </div>
+        </nav>
       </div>
-    </section>
-    <section class="photo_comparison">
-      <nav class="level">
-        <div class="level-item has-text-centered">
-          <div>
-            <figure class="image is-320x240">
-              <img src="../assets/home/1.jpg" alt="tiny bird in tree" width="360" height="240">
-            </figure>
-            <p class="is-size-6">Original Photo</p>
-          </div>
-        </div>
-        <div class="level-item has-text-centered">
-          <div>
-            <figure class="image is-320x240">
-              <img src="../assets/home/1_p.jpg" alt="zoomed image of tiny bird in tree" width="360" height="240">
-            </figure>
-            <p class="is-size-6">Processed Photo</p>
-          </div>
-        </div>
-      </nav>
     </section>
   </div>
 </template>
@@ -80,13 +84,18 @@ export default {
   flex-direction: column;
 }
 
-.intro {
-  padding: 8rem;
+.hero-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.photos {
-  display: flex;
-  align-items: center;
+.intro {
+  padding-top: 10rem;
+}
+
+.level-item {
+  padding: 6rem;
 }
 
 p {
