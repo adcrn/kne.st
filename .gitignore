@@ -1,4 +1,32 @@
-# vim stuff
-*.swp
-
+# Mac stuff
 .DS_Store
+
+# Test coverage
+coverage.out
+test
+
+# Build
+knest
+logfile
+
+## Frontend stuff
+node_modules
+/dist
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
