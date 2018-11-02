@@ -2,9 +2,9 @@ package http
 
 import (
 	"encoding/json"
-	"github.com/adcrn/webknest"
-	"github.com/adcrn/webknest/errors"
-	"github.com/adcrn/webknest/postgres"
+	"github.com/adcrn/webknest/backend"
+	"github.com/adcrn/webknest/backend/errors"
+	"github.com/adcrn/webknest/backend/postgres"
 	"github.com/auth0-community/go-auth0"
 	"github.com/gin-gonic/gin"
 	jose "gopkg.in/square/go-jose.v2"

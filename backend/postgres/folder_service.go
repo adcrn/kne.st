@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"database/sql"
-	"github.com/adcrn/webknest"
+	"github.com/adcrn/webknest/backend"
 	"time"
 
 	_ "github.com/lib/pq" // Driver for database/sql

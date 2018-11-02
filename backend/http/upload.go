@@ -2,7 +2,7 @@ package http
 
 import (
 	"encoding/hex"
-	"github.com/adcrn/webknest"
+	"github.com/adcrn/webknest/backend"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/sha3"
 	"path/filepath"

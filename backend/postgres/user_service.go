@@ -2,8 +2,8 @@ package postgres
 
 import (
 	"database/sql"
-	"github.com/adcrn/webknest"
-	"github.com/adcrn/webknest/errors"
+	"github.com/adcrn/webknest/backend"
+	"github.com/adcrn/webknest/backend/errors"
 
 	_ "github.com/lib/pq" // Driver for database/sql
 	"golang.org/x/crypto/bcrypt"

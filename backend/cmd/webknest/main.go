@@ -6,8 +6,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/adcrn/webknest/http"
-	"github.com/adcrn/webknest/postgres"
+	"github.com/adcrn/webknest/backend/http"
+	"github.com/adcrn/webknest/backend/postgres"
 	"log"
 
 	"github.com/gin-contrib/static"
