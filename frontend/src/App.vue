@@ -28,9 +28,6 @@
 </template>
 
 <style lang="scss">
-#app {
-  background-color: #f8f8f8;
-}
 .navbar {
   padding-left: 0.5rem;
   background-color: #f8f8f8;
