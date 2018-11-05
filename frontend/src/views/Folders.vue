@@ -1,12 +1,12 @@
 <template>
   <div class="folders">
-    <ul v-if="folder_list.length">
-      <FolderItem
-        v-for="folder in folder_list"
-        :key="folder.id"
-        :folder="folder"
-      />
-    </ul>
+    <div class="columns is-multiline" v-if="folder_list.length">
+      <div class="column is-one-third" v-for="folder in folder_list" v-bind:key="folder.id">
+        <FolderItem
+          v-bind:folder="folder"
+        />
+      </div>
+    </div>
     <p v-else>
       There's nothing here!<br>
       <button class="button is-link">Upload a folder</button>
@@ -49,6 +49,26 @@ export default {
           num_elements: 17,
           completed: false,
           downloaded: false
+        },
+        {
+          id: nextfolderid++,
+          owner_id: 1,
+          folder_name: "test3",
+          time: "2018-01-20",
+          path: "./storage/1/terns",
+          num_elements: 12,
+          completed: false,
+          downloaded: false
+        },
+        {
+          id: nextfolderid++,
+          owner_id: 1,
+          folder_name: "test4",
+          time: "2018-02-20",
+          path: "./storage/1/gulls",
+          num_elements: 17,
+          completed: false,
+          downloaded: false
         }
       ]
     };
@@ -72,4 +92,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
+p {
+  padding: 2rem;
+}
+
+.folders {
+  padding: 3rem;
+}
 </style>
