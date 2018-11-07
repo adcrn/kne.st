@@ -1,22 +1,22 @@
 <template>
   <div id="app">
-    <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-        <router-link to="/">
-          <img src="./assets/logo.png" alt="knest logo" width="64" height="28">
-        </router-link>
-      </div>
-      <div class="navbar-end">
-        <div class="navbar-item">
-          <div class="field is-grouped">
-            <p class="control">
+    <nav class="bg-grey-lighter" role="navigation" aria-label="main navigation">
+      <div class="container mx-auto">
+        <div class="flex justify-between items-center">
+          <div>
+            <router-link to="/">
+              <img src="./assets/logo.png" alt="knest logo" width="64" height="28">
+            </router-link>
+          </div>
+          <div class="flex text-lg font-semibold">
+            <p class="px-2">
               <router-link to="/register">
-                <a class="button is-primary"><strong>Sign up</strong></a>
+                <button class="btn btn-blue">Sign Up</button>
               </router-link>
             </p>
-            <p class="control">
+            <p class="px-2">
               <router-link to="/login">
-                <a class="button is-light">Login</a>
+                <button class="btn btn-blue">Login</button>
               </router-link>
             </p>
           </div>
@@ -28,8 +28,15 @@
 </template>
 
 <style lang="scss">
-.navbar {
-  padding-left: 0.5rem;
-  background-color: #f8f8f8;
+.btn {
+  @apply bg-transparent font-semibold py-2 px-4 border rounded;
+}
+
+.btn-blue {
+  @apply text-blue-darker border-blue;
+}
+
+.btn-blue:hover {
+  @apply bg-blue-darker text-white border-transparent;
 }
 </style>

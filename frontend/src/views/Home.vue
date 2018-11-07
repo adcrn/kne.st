@@ -1,54 +1,42 @@
 <template>
-  <div class="home">
-    <section class="hero is-light is-fullheight-with-navbar has-text-centered">
-      <div class="hero-body">
-        <div class="container">
-          <div class="intro">
-          <p class="is-size-4"><strong>An end-to-end solution that selects and enhances bird photographs</strong></p>
-          <p class="is-size-5">
-            <i>knest</i> leverages state-of-the-art techniques in machine learning and<br>
-            computer vision in order to find and crop birds in your photographs.<br>
-            <strong>You upload the photos, we give you the bird(s).</strong>
+  <div class="home bg-grey-lighter">
+    <div class="landing h-full mx-auto flex flex-col">
+      <div class="intro flex flex-col justify-center mt-32">
+        <p class="tagline font-sans text-4xl font-bold text-center">
+          You upload the photos, we give you the bird(s).
+        </p>
+        <p class="blurb text-2xl font-sans font-medium text-center my-8">
+          Knest leverages state-of-the-art techniques<br>
+          in machine learning and computer vision<br>
+          in order to find and crop birds in your photographs.
+        </p>
+        <div class="flex justify-center py-4">
+          <p class="font-sans px-2">
+            <router-link to="/register">
+              <button class="btn">Sign Up</button>
+            </router-link>
           </p>
-          </div>
-          <div class="field is-grouped">
-            <p class="control">
-              <router-link to="/register">
-                <a class="button is-primary is-medium">sign up</a>
-              </router-link>
-            </p>
-            <p class="control">
-              <a class="button is-medium">learn more</a>
-            </p>
-          </div>
+          <p class="font-sans px-2">
+            <a href="#extra"><button class="btn-trans btn-blue">Learn More</button></a>
+          </p>
         </div>
-        <nav class="level">
-          <div class="level-item has-text-centered">
-            <div>
-              <figure class="image is-320x240">
-                <img src="../assets/home/1.jpg" alt="tiny bird in tree" width="360" height="240">
-              </figure>
-              <p class="is-size-6">Original Photo</p>
-            </div>
-          </div>
-          <div class="level-item has-text-centered">
-            <div>
-              <figure class="image is-320x240">
-                <img src="../assets/home/1_p.jpg" alt="zoomed image of tiny bird in tree" width="360" height="240">
-              </figure>
-              <p class="is-size-6">Processed Photo</p>
-            </div>
-          </div>
-        </nav>
       </div>
-    </section>
+      <div class="flex flex-row justify-center py-32">
+        <div class="px-32">
+            <img class="shadow-md" src="../assets/home/1.jpg" alt="tiny bird in tree" width="360" height="240">
+        </div>
+        <div class="px-32">
+            <img class="shadow-md" src="../assets/home/1_p.jpg" alt="zoomed image of tiny bird in tree" width="360" height="240">
+        </div>
+      </div>
+    </div>
+    <div id="extra" class="h-screen mx-auto flex flex-row">
+      <p>test</p>
+    </div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-//import Home from "@/components/Home.vue";
-
 export default {
   name: "home",
   components: {},
@@ -78,31 +66,19 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.container {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+.btn {
+  @apply bg-blue-darker font-semibold text-lg text-white py-2 px-4 border rounded;
 }
 
-.hero-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.btn-trans {
+  @apply bg-transparent font-semibold text-lg py-2 px-4 border rounded;
 }
 
-.intro {
-  padding-top: 10rem;
+.btn-blue {
+  @apply text-blue-darker border-blue;
 }
 
-.level-item {
-  padding: 6rem;
-}
-
-p {
-  padding: 0.5rem;
-}
-
-h1 {
-  margin: 10px 0 0;
+.btn-blue:hover {
+  @apply bg-blue-darker text-white border-transparent;
 }
 </style>

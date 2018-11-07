@@ -34,7 +34,7 @@ Start the server and then direct a browser to `localhost:8080`.
 ### Setup
 Install Vue.js and its corresponding tools along with Buefy, which provides UI components based on the Bulma CSS library; Bulma is also the library used throughout the project.
 ```
-npm install axios buefy vue vuex vue-router
+npm install axios tailwindcss vue vuex vue-router
 ```
 
 ### Usage
@@ -45,7 +45,7 @@ serve`.
 - [ ] Authenticaton
 - [ ] Folder upload flow
 - [ ] Folder view logic
-- [ ] Folder view page
+- [x] Folder view page
 - [x] Home page
 - [ ] Login logic
 - [x] Login page
