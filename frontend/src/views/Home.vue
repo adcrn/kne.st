@@ -1,84 +1,64 @@
 <template>
-  <div class="home bg-grey-lighter">
-    <div class="landing h-full mx-auto flex flex-col">
-      <div class="intro flex flex-col justify-center mt-32">
-        <p class="tagline font-sans text-4xl font-bold text-center">
-          You upload the photos, we give you the bird(s).
-        </p>
-        <p class="blurb text-2xl font-sans font-medium text-center my-8">
-          Knest leverages state-of-the-art techniques<br>
-          in machine learning and computer vision<br>
-          in order to find and crop birds in your photographs.
-        </p>
-        <div class="flex justify-center py-4">
-          <p class="font-sans px-2">
-            <router-link to="/register">
-              <button class="btn">Sign Up</button>
-            </router-link>
-          </p>
-          <p class="font-sans px-2">
-            <a href="#extra"><button class="btn-trans btn-blue">Learn More</button></a>
-          </p>
+  <div class="home bg-grey-lighter py-8">
+    <section class="landing h-screen ml-auto mr-auto w-5/6 max-w-lg">
+      <div class="intro flex items-center justify-center text-center h-full">
+        <div>
+          <h1 class="tagline font-sans text-5xl font-bold text-center leading-none tracking-tight mb-4">
+            You upload the photos,<br>we give you the bird(s)
+          </h1>
+          <h2 class="blurb text-2xl opacity-75 text-blue-darker font-sans font-medium text-center">
+            knest automatically detects birds in your photos and creates <br>beautiful images, giving you more time to experience the world.
+          </h2>
+          <div class="flex flex-row items-center justify-center pt-8 mb-24">
+             <p class="font-sans px-2"> 
+              <router-link to="/register">
+                <button class="btn btn-blue">Sign Up</button>
+              </router-link>
+            </p>
+            <p class="font-sans px-2">
+              <a href="#extra"><button class="btn btn-trans">Learn More</button></a>
+            </p>
+          </div>
+          <image-slider></image-slider>
         </div>
       </div>
-      <div class="flex flex-row justify-center py-32">
-        <div class="px-32">
-            <img class="shadow-md" src="../assets/home/1.jpg" alt="tiny bird in tree" width="360" height="240">
-        </div>
-        <div class="px-32">
-            <img class="shadow-md" src="../assets/home/1_p.jpg" alt="zoomed image of tiny bird in tree" width="360" height="240">
-        </div>
-      </div>
-    </div>
-    <div id="extra" class="h-screen mx-auto flex flex-row">
+    </section>
+    <section id="extra" class="h-screen ml-auto mr-auto flex flex-row">
       <p>test</p>
-    </div>
+    </section>
   </div>
 </template>
 
 <script>
+import ImageSlider from "../components/ImageSlider.vue";
 export default {
   name: "home",
-  components: {},
-  data() {
-    return {
-      images_original: [],
-      images_processed: []
-    };
+  components: {
+    ImageSlider
   },
-  methods: {},
-  created() {
-    (this.images_original = [
-      {
-        url: "../assets/home/1.jpg",
-        alt: "image of tiny bird in tree"
-      }
-    ]),
-      (this.images_processed = [
-        {
-          url: "../assets/home/1_p.jpg",
-          alt: "zoomed in image of tiny bird in tree"
-        }
-      ]);
-  }
+  data() {}
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .btn {
-  @apply bg-blue-darker font-semibold text-lg text-white py-2 px-4 border rounded;
+  @apply ml-8 font-semibold text-xl py-2 px-4 border text-blue-darker rounded;
 }
 
 .btn-trans {
-  @apply bg-transparent font-semibold text-lg py-2 px-4 border rounded;
+  @apply bg-transparent font-semibold text-xl py-2 px-4 border-blue rounded;
+}
+
+.btn-trans:hover {
+  @apply bg-blue-darker text-white;
 }
 
 .btn-blue {
-  @apply text-blue-darker border-blue;
+  @apply bg-blue-darker text-white border-blue;
 }
 
 .btn-blue:hover {
-  @apply bg-blue-darker text-white border-transparent;
+  @apply bg-transparent text-blue-darker;
 }
 </style>
