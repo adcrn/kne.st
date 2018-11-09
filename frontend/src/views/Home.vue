@@ -1,5 +1,5 @@
 <template>
-  <div class="home bg-grey-lighter py-8">
+  <div class="home bg-grey-lighter">
     <section class="landing h-screen ml-auto mr-auto w-5/6 max-w-lg">
       <div class="intro flex items-center justify-center text-center h-full">
         <div>

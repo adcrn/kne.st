@@ -1,6 +1,6 @@
 <template>
-    <div class="flex flex-row justify-center">
-        <div class="pr-16">
+    <div class="relative flex flex-row w-auto h-auto">
+        <div class="absolute flex-grow pin-l pin-t w-3/7">
             <transition-group name='fade' tag='div'>
                 <div
                 v-for="number in [currentNumber]"
@@ -9,13 +9,12 @@
                     <img class="shadow-md"
                     v-bind:src="currentImageOriginal.url"
                     v-bind:alt="currentImageOriginal.alt"
-                    width="360"
-                    height="240" 
                     >
                 </div>
             </transition-group>
         </div>
-        <div class="pl-16">
+        <div class="w-1/7"></div>
+        <div class="absolute flex-grow pin-r pin-t w-3/7">
             <transition-group name='fade' tag='div'>
                 <div
                 v-for="number in [currentNumber]"
@@ -24,8 +23,6 @@
                     <img class="shadow-md"
                     v-bind:src="currentImageProcessed.url"
                     v-bind:alt="currentImageProcessed.alt"
-                    width="360"
-                    height="240"
                     >
                 </div>
           </transition-group>
@@ -86,7 +83,7 @@ export default {
 
   methods: {
     startRotation: function() {
-      this.timer = setInterval(this.next, 7500);
+      this.timer = setInterval(this.next, 6000);
     },
 
     next: function() {
@@ -113,7 +110,7 @@ export default {
 .fade-enter-active,
 .fade-leave-active {
   transition: all 0.8s ease;
-  overflow: hidden;
+  overflow: visible;
   visibility: visible;
   opacity: 1;
   position: absolute;
