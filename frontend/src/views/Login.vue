@@ -1,31 +1,36 @@
 <template>
   <div class="login">
-    <div class="w-full max-w-xs mx-auto">
-      <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <div class="mb-4">
-          <label class="block text-grey-darker text-sm font-bold mb-2" for="username">
-            Username
-          </label>
-          <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="">
+    <div class="flex h-screen items-center justify-center">
+      <form class="w-full max-w-xs">
+        <div class="md:flex md:items-center mb-6">
+          <div class="md:w-1/3">
+            <label class="block text-grey-darker font-bold md:text-right mb-1 md:mb-0 pr-4" for="inline-username">
+              Username
+            </label>
+          </div>
+          <div class="md:w-2/3">
+            <input class="bg-white appearance-none border-2 border-grey-lighter rounded w-full py-2 px-4 text-grey-darker leading-tight focus:outline-none focus:border-blue" id="inline-full-name" type="text" placeholder="janedoe">
+          </div>
         </div>
-        <div class="mb-6">
-          <label class="block text-grey-darker text-sm font-bold mb-2" for="password">
-            Password
-          </label>
-          <input class="shadow appearance-none border border rounded w-full py-2 px-3 text-grey-darker mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="">
+        <div class="md:flex md:items-center mb-6">
+          <div class="md:w-1/3">
+            <label class="block text-grey-darker font-bold md:text-right mb-1 md:mb-0 pr-4" for="inline-username">
+              Password
+            </label>
+          </div>
+          <div class="md:w-2/3">
+            <input class="bg-white appearance-none border-2 border-grey-lighter rounded w-full py-2 px-4 text-grey-darker leading-tight focus:outline-none focus:bg-white focus:border-blue" id="inline-username" type="password" placeholder="***********">
+          </div>
         </div>
-        <div class="flex items-center justify-between">
-          <button class="bg-blue hover:bg-blue-dark text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-            Sign In
-          </button>
-          <a class="inline-block align-baseline font-bold text-sm text-blue hover:text-blue-darker" href="#">
-            Forgot Password?
-          </a>
+        <div class="md:flex md:items-center">
+          <div class="md:w-1/3"></div>
+          <div class="md:w-2/3">
+            <button class="shadow bg-blue-darker hover:bg-blue-darkest focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded" type="button">
+              Login
+            </button>
+          </div>
         </div>
       </form>
-      <p class="text-center text-grey text-xs">
-        ©2018 knest. All rights reserved.
-      </p>
     </div>
   </div>
 </template>

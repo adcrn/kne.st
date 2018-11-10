@@ -1,6 +1,6 @@
 <template>
-  <div class="home bg-grey-lighter">
-    <section class="landing h-screen ml-auto mr-auto w-5/6 max-w-lg">
+  <div class="home">
+    <section class="landing h-screen ml-auto mr-auto max-w-lg">
       <div class="intro flex items-center justify-center text-center h-full">
         <div>
           <h1 class="tagline font-sans text-5xl font-bold text-center leading-none tracking-tight mb-4">

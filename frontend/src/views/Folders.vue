@@ -1,7 +1,7 @@
 <template>
-  <div class="folders">
-    <div class="columns is-multiline" v-if="folder_list.length">
-      <div class="column is-one-third" v-for="folder in folder_list" v-bind:key="folder.id">
+  <div class="folders flex mb-4">
+    <div class="columns" v-if="folder_list.length">
+      <div class="column w-full bg-white h-12" v-for="folder in folder_list" v-bind:key="folder.id">
         <FolderItem
           v-bind:folder="folder"
         />

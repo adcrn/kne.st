@@ -1,5 +1,5 @@
 <template>
-    <div class="relative flex flex-row w-auto h-auto">
+    <div class="relative flex flex-row h-auto">
         <div class="absolute flex-grow pin-l pin-t w-3/7">
             <transition-group name='fade' tag='div'>
                 <div
@@ -110,7 +110,7 @@ export default {
 .fade-enter-active,
 .fade-leave-active {
   transition: all 0.8s ease;
-  overflow: visible;
+  overflow: hidden;
   visibility: visible;
   opacity: 1;
   position: absolute;
